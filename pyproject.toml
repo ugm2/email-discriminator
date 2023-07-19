@@ -4,12 +4,13 @@ version = "0.0.1"
 description = "This is a project for the MLOps Zoomcamp Course where I'll be creating an email discriminator"
 authors = ["ugm2 <unaigaraymaestre@gmail.com>"]
 readme = "README.md"
-packages = []
+packages = [{include = "email_discriminator"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 google-auth-oauthlib = "^1.0.0"
 google-api-python-client = "^2.93.0"
+rich = "^13.4.2"
 
 
 [tool.poetry.group.dev.dependencies]
