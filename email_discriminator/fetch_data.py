@@ -182,3 +182,4 @@ if __name__ == "__main__":
     articles_df = pd.concat([relevant_df, irrelevant_df], ignore_index=True)
 
     print(articles_df.head())
+    print(articles_df["is_relevant"].value_counts())
