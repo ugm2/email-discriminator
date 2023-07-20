@@ -7,6 +7,7 @@ from google.auth.transport.requests import Request
 import base64
 from rich import print
 from abc import ABC, abstractmethod
+import pandas as pd
 
 
 class EmailFetcher:
@@ -169,3 +170,15 @@ if __name__ == "__main__":
     print("\n\n")
     print("Irrelevant articles:")
     print(irrelevant_articles[:5])
+
+    # Convert the lists of relevant and irrelevant articles into pandas DataFrames
+    relevant_df = pd.DataFrame(relevant_articles)
+    relevant_df["is_relevant"] = 1
+
+    irrelevant_df = pd.DataFrame(irrelevant_articles)
+    irrelevant_df["is_relevant"] = 0
+
+    # Concatenate the two DataFrames into a single DataFrame
+    articles_df = pd.concat([relevant_df, irrelevant_df], ignore_index=True)
+
+    print(articles_df.head())
