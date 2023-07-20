@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 import base64
 from rich import print
+from abc import ABC, abstractmethod
 
 
 class EmailFetcher:
@@ -35,77 +36,27 @@ class EmailFetcher:
                 pickle.dump(creds, token)
         return build("gmail", "v1", credentials=creds)
 
-    def fetch_emails(self, label_name):
-        """Fetch emails from a specific Gmail label."""
-        label_id = self.get_label_id(label_name)
+    def fetch_emails(self, query):
+        """Fetch emails based on a specific query."""
         return (
             self.service.users()
             .messages()
-            .list(userId="me", labelIds=[label_id])
+            .list(userId="me", q=query)
             .execute()
             .get("messages", [])
         )
 
-    def fetch_email_data(self, email_id):
-        """Fetch the data of a specific email."""
+    def get_email_data(self, email_id):
+        """Get data of a specific email."""
         return self.service.users().messages().get(userId="me", id=email_id).execute()
 
-    def fetch_tldr_articles(self, emails):
-        """Extract TLDR articles from a list of emails."""
-        tldr_articles = []
+    def get_articles_from_emails(self, emails, content_parser):
+        """Extract articles from a list of emails using a specific content parser."""
+        articles = []
         for email in emails:
-            email_data = self.fetch_email_data(email["id"])
+            email_data = self.get_email_data(email["id"])
             content = self.get_body(email_data)
-
-            sections = self.extract_sections(content)
-
-            for section, section_content in sections.items():
-                articles = self.extract_articles(section_content)
-                for article in articles:
-                    tldr_articles.append(
-                        {
-                            "email_id": email["id"],
-                            "section": section,
-                            "article": article,
-                        }
-                    )
-        return tldr_articles
-
-    def get_articles_by_section(self, content):
-        """Split content into sections and extract articles from each section."""
-        sections = self.extract_sections(content)
-        articles_by_section = {}
-        for i, section in enumerate(sections):
-            articles = self.extract_articles(section)
-            articles_by_section[i] = articles
-        return articles_by_section
-
-    def extract_sections(self, content):
-        """Extract sections from TLDR content."""
-        sections = {
-            "BIG TECH & STARTUPS": None,
-            "SCIENCE & FUTURISTIC TECHNOLOGY": None,
-            "PROGRAMMING, DESIGN & DATA SCIENCE": None,
-            "MISCELLANEOUS": None,
-            "QUICK LINKS": None,
-        }
-        pattern = rf"[\u263a-\U0001f645]*\s*({ '|'.join(sections.keys()) })\s*[\r\n]+(.*?)(?=[\u263a-\U0001f645]*\s*({ '|'.join(sections.keys()) })\s*[\r\n]+|$)"
-        matches = re.findall(pattern, content, re.DOTALL)
-        for section, section_content, _ in matches:
-            sections[section] = section_content.strip()
-        return sections
-
-    def extract_articles(self, section_content):
-        """Extract articles from a section."""
-        if section_content is None:
-            return []
-
-        # TODO: Improve pattern
-        # Define the pattern to identify each article
-        pattern = r"\(\d(?:.+| \n)MINUTE(?:.+| \n)READ\)"
-
-        # Use findall to capture all instances that match the pattern
-        articles = re.findall(pattern, section_content, re.DOTALL)
+            articles += content_parser(content)
         return articles
 
     def fetch_labels(self):
@@ -134,21 +85,87 @@ class EmailFetcher:
             )
 
 
+class ContentParser(ABC):
+    """Abstract base class for content parsers."""
+
+    @abstractmethod
+    def parse_content(self, content):
+        pass
+
+
+class TLDRContentParser(ContentParser):
+    def __init__(self):
+        self.sections = {
+            "BIG TECH & STARTUPS": None,
+            "SCIENCE & FUTURISTIC TECHNOLOGY": None,
+            "PROGRAMMING, DESIGN & DATA SCIENCE": None,
+            "MISCELLANEOUS": None,
+            "QUICK LINKS": None,
+        }
+
+    def parse_content(self, content):
+        """Extract TLDR articles from content."""
+        tldr_articles = []
+        sections_content = self.extract_sections(content)
+
+        for section, section_content in sections_content.items():
+            articles = self.extract_articles(section_content)
+            for article in articles:
+                tldr_articles.append(
+                    {
+                        "section": section,
+                        "article": article,
+                    }
+                )
+        return tldr_articles
+
+    def extract_sections(self, content):
+        """Extract sections from TLDR content."""
+        pattern = rf"[\u263a-\U0001f645]*\s*({ '|'.join(self.sections.keys()) })\s*[\r\n]+(.*?)(?=[\u263a-\U0001f645]*\s*({ '|'.join(self.sections.keys()) })\s*[\r\n]+|$)"
+        matches = re.findall(pattern, content, re.DOTALL)
+        for section, section_content, _ in matches:
+            self.sections[section] = section_content.strip()
+        return self.sections
+
+    def extract_articles(self, section_content):
+        """Extract articles from a section."""
+        if section_content is None:
+            return []
+
+        # Split the section content into articles
+        articles = section_content.split("\r\n\r\n")
+
+        # Combine the title and content into the same chunk
+        articles = [
+            "\r\n\r\n".join(articles[i : i + 2]) for i in range(0, len(articles), 2)
+        ]
+        # Filter out strings that don't appear to be articles
+        articles = [
+            article for article in articles if re.search(r"MINUTE\s*READ", article)
+        ]
+
+        return articles
+
+
 if __name__ == "__main__":
     fetcher = EmailFetcher()
+    tldr_parser = TLDRContentParser()
 
     # Fetch emails from the relevant and irrelevant labels
-    relevant_emails = fetcher.fetch_emails("TLDRs")
-    # irrelevant_emails = fetcher.fetch_emails(
-    #     "Archived"
-    # )  # replace "Archived" with the actual name of your label
-
+    relevant_emails = fetcher.fetch_emails("label:TLDRs")
+    irrelevant_emails = fetcher.fetch_emails(
+        f"from:dan@tldrnewsletter.com is:read -label:TLDRs"
+    )
     # Extract the TLDR articles from the emails
-    relevant_articles = fetcher.fetch_tldr_articles(relevant_emails)
-    # irrelevant_articles = fetcher.fetch_tldr_articles(irrelevant_emails)
+    relevant_articles = fetcher.get_articles_from_emails(
+        relevant_emails, tldr_parser.parse_content
+    )
+    irrelevant_articles = fetcher.get_articles_from_emails(
+        irrelevant_emails, tldr_parser.parse_content
+    )
 
     print("TLDR articles:")
-    print(relevant_articles[:2])
-    # print("\n\n")
-    # print("Irrelevant articles:")
-    # print(irrelevant_articles[:5])
+    print(relevant_articles[:5])
+    print("\n\n")
+    print("Irrelevant articles:")
+    print(irrelevant_articles[:5])

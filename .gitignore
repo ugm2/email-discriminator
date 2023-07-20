@@ -162,3 +162,5 @@ cython_debug/
 # Gmail API
 client_secret.json
 token.pickle
+
+.vscode/
