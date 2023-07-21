@@ -142,7 +142,9 @@ class TLDRContentParser(ContentParser):
         ]
         # Filter out strings that don't appear to be articles
         articles = [
-            article for article in articles if re.search(r"MINUTE\s*READ", article)
+            article
+            for article in articles
+            if re.search(r"(MINUTE\s*READ)|(GITHUB\s*REPO)", article, re.IGNORECASE)
         ]
 
         return articles
