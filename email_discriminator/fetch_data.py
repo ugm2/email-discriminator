@@ -203,6 +203,10 @@ if __name__ == "__main__":
     print(articles_df)
     print(articles_df["is_relevant"].value_counts())
 
+    # Save dataframe to csv
+    os.makedirs("data", exist_ok=True)
+    articles_df.to_csv("data/tldr_articles.csv", index=False)
+
     # Create dataframe for unread TLDR emails
     unread_df = builder.create_predict_dataframe(
         "from:dan@tldrnewsletter.com is:unread"

@@ -17,6 +17,13 @@ pandas = "^2.0.3"
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
 
+
+[tool.poetry.group.notebook.dependencies]
+matplotlib = "^3.7.2"
+jupyter = "^1.0.0"
+ipykernel = "^6.24.0"
+seaborn = "^0.12.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -164,3 +164,4 @@ client_secret.json
 token.pickle
 
 .vscode/
+.DS_Store
