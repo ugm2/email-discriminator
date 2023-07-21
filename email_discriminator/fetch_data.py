@@ -150,38 +150,61 @@ class TLDRContentParser(ContentParser):
         return articles
 
 
+class EmailDatasetBuilder:
+    def __init__(self, fetcher, parser):
+        self.fetcher = fetcher
+        self.parser = parser
+
+    def create_training_dataframe(self, relevant_query, irrelevant_query):
+        # Fetch emails from the relevant and irrelevant labels
+        relevant_emails = self.fetcher.fetch_emails(relevant_query)
+        irrelevant_emails = self.fetcher.fetch_emails(irrelevant_query)
+
+        # Extract the TLDR articles from the emails
+        relevant_articles = self.fetcher.get_articles_from_emails(
+            relevant_emails, self.parser.parse_content
+        )
+        irrelevant_articles = self.fetcher.get_articles_from_emails(
+            irrelevant_emails, self.parser.parse_content
+        )
+
+        # Convert the lists of relevant and irrelevant articles into pandas DataFrames
+        relevant_df = pd.DataFrame(relevant_articles)
+        relevant_df["is_relevant"] = 1
+
+        irrelevant_df = pd.DataFrame(irrelevant_articles)
+        irrelevant_df["is_relevant"] = 0
+
+        # Concatenate the two DataFrames into a single DataFrame
+        return pd.concat([relevant_df, irrelevant_df], ignore_index=True)
+
+    def create_predict_dataframe(self, query):
+        # Fetch unread emails based on query
+        unread_emails = self.fetcher.fetch_emails(query)
+
+        # Extract the articles from the emails
+        articles = self.fetcher.get_articles_from_emails(
+            unread_emails, self.parser.parse_content
+        )
+
+        # Convert the list of articles into a pandas DataFrame
+        return pd.DataFrame(articles)
+
+
 if __name__ == "__main__":
     fetcher = EmailFetcher()
-    tldr_parser = TLDRContentParser()
+    parser = TLDRContentParser()
 
-    # Fetch emails from the relevant and irrelevant labels
-    relevant_emails = fetcher.fetch_emails("label:TLDRs")
-    irrelevant_emails = fetcher.fetch_emails(
-        f"from:dan@tldrnewsletter.com is:read -label:TLDRs"
-    )
-    # Extract the TLDR articles from the emails
-    relevant_articles = fetcher.get_articles_from_emails(
-        relevant_emails, tldr_parser.parse_content
-    )
-    irrelevant_articles = fetcher.get_articles_from_emails(
-        irrelevant_emails, tldr_parser.parse_content
+    builder = EmailDatasetBuilder(fetcher, parser)
+    articles_df = builder.create_training_dataframe(
+        "label:TLDRs", "from:dan@tldrnewsletter.com is:read -label:TLDRs"
     )
 
-    print("TLDR articles:")
-    print(relevant_articles[:5])
-    print("\n\n")
-    print("Irrelevant articles:")
-    print(irrelevant_articles[:5])
-
-    # Convert the lists of relevant and irrelevant articles into pandas DataFrames
-    relevant_df = pd.DataFrame(relevant_articles)
-    relevant_df["is_relevant"] = 1
-
-    irrelevant_df = pd.DataFrame(irrelevant_articles)
-    irrelevant_df["is_relevant"] = 0
-
-    # Concatenate the two DataFrames into a single DataFrame
-    articles_df = pd.concat([relevant_df, irrelevant_df], ignore_index=True)
-
-    print(articles_df.head())
+    print(articles_df)
     print(articles_df["is_relevant"].value_counts())
+
+    # Create dataframe for unread TLDR emails
+    unread_df = builder.create_predict_dataframe(
+        "from:dan@tldrnewsletter.com is:unread"
+    )
+    print(unread_df)
