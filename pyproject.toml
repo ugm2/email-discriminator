@@ -12,6 +12,10 @@ google-auth-oauthlib = "^1.0.0"
 google-api-python-client = "^2.93.0"
 rich = "^13.4.2"
 pandas = "^2.0.3"
+mlflow = "^2.5.0"
+xgboost = "^1.7.6"
+plotly = "^5.15.0"
+imblearn = "^0.0"
 
 
 [tool.poetry.group.dev.dependencies]

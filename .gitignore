@@ -165,3 +165,7 @@ token.pickle
 
 .vscode/
 .DS_Store
+
+# MLFlow
+mlruns/
+mlartifacts/
