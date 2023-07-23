@@ -115,17 +115,3 @@ class TLDRContentParser(ContentParserInterface):
 
         logger.info(f"Extracted {len(articles)} articles from the section content")
         return articles
-
-
-if __name__ == "__main__":
-    from email_discriminator.core.data_fetcher.email_fetcher import EmailFetcher
-
-    fetcher = EmailFetcher()
-    parser = TLDRContentParser()
-
-    relevant_emails = fetcher.fetch_emails("label:TLDRs")
-
-    relevant_articles = fetcher.get_articles_from_emails(
-        relevant_emails, parser.parse_content
-    )
-    print(relevant_articles[:2])

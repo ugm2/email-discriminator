@@ -92,20 +92,3 @@ class EmailDatasetBuilder:
             raise
 
         return pd.DataFrame(articles)
-
-
-if __name__ == "__main__":
-    fetcher = EmailFetcher()
-    from email_discriminator.core.data_fetcher.content_parser import TLDRContentParser
-
-    parser = TLDRContentParser()
-
-    builder = EmailDatasetBuilder(fetcher, parser)
-    try:
-        articles_df = builder.create_training_dataframe(
-            "label:TLDRs", "from:dan@tldrnewsletter.com is:read -label:TLDRs"
-        )
-        print(articles_df)
-        print(articles_df["is_relevant"].value_counts())
-    except Exception as e:
-        logger.error(f"Failed to create training dataframe due to {str(e)}")

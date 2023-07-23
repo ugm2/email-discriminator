@@ -1,22 +1,23 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
 from email_discriminator.core.data_fetcher.email_fetcher import EmailFetcher
 
 
-@patch(
-    "email_discriminator.core.data_fetcher.email_fetcher.build"
-)  # Mocking the build function
+@patch("builtins.open", new_callable=mock_open, read_data="token.pickle")
+@patch("email_discriminator.core.data_fetcher.email_fetcher.build")
 @patch(
     "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
 )
 @patch("email_discriminator.core.data_fetcher.email_fetcher.pickle.load")
 @patch("email_discriminator.core.data_fetcher.email_fetcher.os.path.exists")
-def test_get_service(mock_exists, mock_load, mock_flow, mock_build):
+def test_get_service(mock_exists, mock_load, mock_flow, mock_build, mock_open):
     mock_exists.return_value = True
     mock_load.return_value = MagicMock(valid=True)
     mock_build.return_value = "Service"
+    mock_open.return_value.__enter__.return_value = mock_open.return_value
+
     fetcher = EmailFetcher()
     assert fetcher.service == "Service"
 
@@ -51,7 +52,8 @@ def test_fetch_labels(mock_get_service):
 @patch.object(
     EmailFetcher, "fetch_labels", return_value=[{"name": "Label", "id": "ID"}]
 )
-def test_get_label_id(mock_fetch_labels):
+@patch.object(EmailFetcher, "get_service", return_value=None)
+def test_get_label_id(mock_get_service, mock_fetch_labels):
     fetcher = EmailFetcher()
     assert fetcher.get_label_id("Label") == "ID"
     with pytest.raises(ValueError):
@@ -76,7 +78,8 @@ def test_get_body(mock_get_service):
     return_value={"payload": {"body": {"data": "aGVsbG8gd29ybGQ="}}},
 )  # 'aGVsbG8gd29ybGQ=' is 'hello world' in base64
 @patch.object(EmailFetcher, "get_body", return_value="hello world")
-def test_get_articles_from_emails(mock_get_body, mock_get_email_data):
+@patch.object(EmailFetcher, "get_service", return_value=None)
+def test_get_articles_from_emails(mock_get_service, mock_get_body, mock_get_email_data):
     emails = [{"id": "1"}, {"id": "2"}]
     content_parser = lambda content: content.split()
 

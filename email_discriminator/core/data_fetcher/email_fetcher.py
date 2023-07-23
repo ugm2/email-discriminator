@@ -167,9 +167,3 @@ class EmailFetcher:
             content = self.get_body(email_data)
             articles += content_parser(content)
         return articles
-
-
-if __name__ == "__main__":
-    fetcher = EmailFetcher()
-    relevant_emails = fetcher.fetch_emails("label:TLDRs")
-    print(relevant_emails[:2])

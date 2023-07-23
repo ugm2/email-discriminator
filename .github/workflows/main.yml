@@ -18,22 +18,9 @@ jobs:
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
 
-    - name: Cache Poetry virtualenv
-      uses: actions/cache@v2
-      id: cache
-      with:
-        path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
-
     - name: Install dependencies
       run: |
         poetry install
-
-    - name: Install Tox
-      run: |
-        poetry add tox
 
     - name: Run Tox
       run: |
