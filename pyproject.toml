@@ -20,6 +20,7 @@ imblearn = "^0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
+pytest = "^7.4.0"
 
 
 [tool.poetry.group.notebook.dependencies]

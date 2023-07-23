@@ -17,17 +17,21 @@ The goal of this project is to develop an email discriminator to filter the TLDR
 
 The problem is a binary classification task with two classes:
 
-Class 1: Relevant TLDR articles
-Class 0: Irrelevant TLDR articles
+* Class 1: Relevant TLDR articles
+
+* Class 0: Irrelevant TLDR articles
+
 The model will take as input the text of a TLDR article and output a prediction of whether it is relevant (Class 1) or not (Class 0).
 
 ### Data
 
-The data for this project comes from the user's Gmail account. The user has categorized the TLDRs into different labels:
+The data for this project comes from the user's Gmail account. The user has MANUALLY categorised the TLDRs into different labels:
 
-TLDRs that the user cares about are in a Gmail label called "TLDRs". These TLDRs will form the positive class (Class 1).
-"Archived" TLDRs that the user doesn't care about will form the negative class (Class 0).
-TLDRs in the "inbox" are the ones on which the model will make predictions.
+* TLDRs that the user cares about are in a Gmail label called "TLDRs". These TLDRs will form the positive class (Class 1).
+
+* "Archived" TLDRs that the user doesn't care about will form the negative class (Class 0).
+
+* TLDRs in the "inbox" are the ones on which the model will make predictions.
 Each TLDR contains a title and text, which are the features that the model will use to make predictions. The label (relevant or not) is the target variable.
 
 Where and how these are stored in Gmail depends on the user, but in this case this is how I'm storing it.
@@ -36,14 +40,12 @@ Where and how these are stored in Gmail depends on the user, but in this case th
 
 The approach to solving this problem involves several steps:
 
-1. **Data Collection**: Using the Gmail API to fetch the TLDRs from the different Gmail labels.
+1. **Data Collection**: Using the Gmail API to fetch the TLDRs from the different Gmail labels. I'm dumping the data into a CSV file in the `data` folder.
 
-2. **Data Preprocessing**: Processing and cleaning the text data.
+2. **Data Exploration**: Loading, analysing and visualising the data. This will be done in the notebook [notebooks/tld_articles_exploration.ipynb](notebooks/tld_articles_exploration.ipynb).
 
-3. **Feature Engineering**: Converting the text data into a form that can be used to train a machine learning model.
+3. **Model Exploration**: Experimenting with different machine learning models to solve the task at hand. This will be done in the notebook [notebooks/tld_articles_model_exploration.ipynb](notebooks/tld_articles_model_exploration.ipynb) where we will use MLFlow as model experimentation tool.
 
-4. **Model Training**: Training a binary classification model on the processed data.
+4. **Model as Service**: Code refactoring and creation of a batch model service.
 
-5. **Model Evaluation**: Evaluating the model's performance using suitable metrics.
-
-6. **Model Deployment**: Deploying the model to a production environment where it can make predictions on new, unseen TLDRs.
+5. **Model Deployment**: Deploying the model to a production environment where it can make predictions on new, unseen TLDRs.
