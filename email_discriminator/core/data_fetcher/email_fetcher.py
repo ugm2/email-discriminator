@@ -1,14 +1,15 @@
+import base64
+import logging
 import os
 import pickle
 from contextlib import closing
+from typing import Callable, Dict, List
+
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build, Resource
-import base64
-from typing import Callable, Dict, List
-from rich.logging import RichHandler
+from googleapiclient.discovery import Resource, build
 from rich import print
-import logging
+from rich.logging import RichHandler
 
 # Get the logger level from environment variables. Default to WARNING if not set.
 LOGGER_LEVEL = os.getenv("LOGGER_LEVEL", "WARNING")

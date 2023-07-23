@@ -1,8 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from email_discriminator.core.data_fetcher.email_fetcher import (
-    EmailFetcher,
-)
+
+from email_discriminator.core.data_fetcher.email_fetcher import EmailFetcher
 
 
 @patch(

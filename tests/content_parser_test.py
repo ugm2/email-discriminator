@@ -1,4 +1,5 @@
 import pytest
+
 from email_discriminator.core.data_fetcher.content_parser import TLDRContentParser
 
 

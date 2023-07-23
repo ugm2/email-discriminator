@@ -1,10 +1,12 @@
 import os
+
 from rich import print
+
+from email_discriminator.core.data_fetcher.content_parser import TLDRContentParser
 from email_discriminator.core.data_fetcher.email_dataset_builder import (
     EmailDatasetBuilder,
 )
 from email_discriminator.core.data_fetcher.email_fetcher import EmailFetcher
-from email_discriminator.core.data_fetcher.content_parser import TLDRContentParser
 
 
 def fetch_data():
