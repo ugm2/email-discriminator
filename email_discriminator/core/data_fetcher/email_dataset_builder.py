@@ -2,7 +2,6 @@ import logging
 import os
 
 import pandas as pd
-from rich import print
 from rich.logging import RichHandler
 
 from email_discriminator.core.data_fetcher.content_parser import ContentParserInterface

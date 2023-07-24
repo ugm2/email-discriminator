@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
-from email_discriminator.core.data_fetcher.email_fetcher import EmailFetcher
+from email_discriminator.core.data_fetcher import EmailFetcher
 
 
 @patch("builtins.open", new_callable=mock_open, read_data="token.pickle")

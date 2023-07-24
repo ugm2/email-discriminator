@@ -3,9 +3,7 @@ from unittest.mock import Mock, patch
 import pandas as pd
 import pytest
 
-from email_discriminator.core.data_fetcher.email_dataset_builder import (
-    EmailDatasetBuilder,
-)
+from email_discriminator.core.data_fetcher import EmailDatasetBuilder
 
 
 @pytest.fixture

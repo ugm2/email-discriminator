@@ -1,6 +1,6 @@
 import pytest
 
-from email_discriminator.core.data_fetcher.content_parser import TLDRContentParser
+from email_discriminator.core.data_fetcher import TLDRContentParser
 
 
 @pytest.fixture

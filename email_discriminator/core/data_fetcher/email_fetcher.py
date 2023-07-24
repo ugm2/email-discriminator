@@ -8,7 +8,6 @@ from typing import Callable, Dict, List
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource, build
-from rich import print
 from rich.logging import RichHandler
 
 # Get the logger level from environment variables. Default to WARNING if not set.
