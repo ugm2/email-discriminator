@@ -131,6 +131,10 @@ def log_metrics_and_model(report, grid_search, model_name):
     run_id = mlflow.active_run().info.run_id
     model_uri = f"runs:/{run_id}/model"
     model_version = mlflow.register_model(model_uri, model_name)
+    client = mlflow.tracking.MlflowClient()
+    client.transition_model_version_stage(
+        name=model_name, version=model_version.version, stage="Production"
+    )
 
     # Log model version in prefect as an artifact
     model_version_details = {
@@ -138,7 +142,7 @@ def log_metrics_and_model(report, grid_search, model_name):
         "version": model_version.version,
         "creation_timestamp": model_version.creation_timestamp,
         "last_updated_timestamp": model_version.last_updated_timestamp,
-        "current_stage": model_version.current_stage,
+        "current_stage": "Production",
         "description": model_version.description,
         "user_id": model_version.user_id,
         "source": model_version.source,
@@ -156,7 +160,7 @@ def log_metrics_and_model(report, grid_search, model_name):
 
 
 @flow
-def train():
+def train_flow():
     logger = get_run_logger()
     logger.info("Starting training flow")
     df = load_data("data/tldr_articles.csv")
@@ -169,4 +173,4 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    train_flow()
