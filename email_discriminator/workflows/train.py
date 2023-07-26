@@ -1,3 +1,6 @@
+import os
+from typing import Dict, List, Tuple, Union
+
 import mlflow
 import pandas as pd
 from imblearn.over_sampling import RandomOverSampler
@@ -9,12 +12,25 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 
 from email_discriminator.core.model import DataProcessor, Model
 
-mlflow.set_tracking_uri("http://localhost:5001/")
-mlflow.get_experiment_by_name("email_discriminator")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000/")
+DATA_PATH = os.getenv("DATA_PATH", "data/tldr_articles.csv")
+MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment(MODEL_NAME)
 
 
 @task
-def load_data(file_path):
+def load_data(file_path: str) -> pd.DataFrame:
+    """
+    Loads the data from a given file path.
+
+    Args:
+        file_path: The path to the data file.
+
+    Returns:
+        A pandas DataFrame containing the loaded data.
+    """
     logger = get_run_logger()
     logger.info(f"Loading data from {file_path}")
     df = pd.read_csv(file_path)
@@ -23,7 +39,18 @@ def load_data(file_path):
 
 
 @task
-def split_data(df):
+def split_data(
+    df: pd.DataFrame,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """
+    Splits the data into training and testing sets.
+
+    Args:
+        df: A pandas DataFrame containing the data to be split.
+
+    Returns:
+        A tuple containing the training and testing data and labels.
+    """
     logger = get_run_logger()
     logger.info("Splitting data into train and test sets")
     return train_test_split(
@@ -32,7 +59,7 @@ def split_data(df):
 
 
 @task
-def load_pipeline():
+def load_pipeline() -> imblearnPipeline:
     logger = get_run_logger()
     logger.info("Loading pipeline")
     return imblearnPipeline(
@@ -45,7 +72,7 @@ def load_pipeline():
 
 
 @task
-def create_grid_search(pipeline):
+def create_grid_search(pipeline: imblearnPipeline) -> GridSearchCV:
     logger = get_run_logger()
     logger.info("Creating GridSearchCV object")
     scorer = make_scorer(recall_score)
@@ -57,14 +84,16 @@ def create_grid_search(pipeline):
 
 
 @task
-def fit(grid_search, X_train, y_train):
+def fit(grid_search: GridSearchCV, X_train: pd.DataFrame, y_train: pd.Series) -> None:
     logger = get_run_logger()
     logger.info("Fitting GridSearchCV object")
     grid_search.fit(X_train, y_train)
 
 
 @task
-def evaluation(grid_search, X_test, y_test):
+def evaluation(
+    grid_search: GridSearchCV, X_test: pd.DataFrame, y_test: pd.Series
+) -> Dict:
     logger = get_run_logger()
     logger.info("Evaluating the best model")
     y_pred = grid_search.predict(X_test)
@@ -73,7 +102,12 @@ def evaluation(grid_search, X_test, y_test):
 
 
 @task
-def log_metrics_and_model(report, grid_search, model_name):
+def log_metrics_and_model(
+    report: Dict, grid_search: GridSearchCV, model_name: str
+) -> None:
+    """
+    Logs metrics and model to MLFlow, registers the model, and logs model version as a Prefect artifact.
+    """
     logger = get_run_logger()
     logger.info("Logging metrics and model")
     logger.info(report)
@@ -160,16 +194,20 @@ def log_metrics_and_model(report, grid_search, model_name):
 
 
 @flow
-def train_flow():
+def train_flow() -> None:
+    """
+    The main flow for training the model, includes loading data, splitting it, creating and fitting a pipeline,
+    evaluating the pipeline, and logging metrics and model.
+    """
     logger = get_run_logger()
     logger.info("Starting training flow")
-    df = load_data("data/tldr_articles.csv")
+    df = load_data(DATA_PATH)
     X_train, X_test, y_train, y_test = split_data(df)
     pipeline = load_pipeline()
     grid_search = create_grid_search(pipeline)
     fit(grid_search, X_train, y_train)
     report = evaluation(grid_search, X_test, y_test)
-    log_metrics_and_model(report, grid_search, "email_discriminator")
+    log_metrics_and_model(report, grid_search, MODEL_NAME)
 
 
 if __name__ == "__main__":

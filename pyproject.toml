@@ -17,6 +17,7 @@ xgboost = "^1.7.6"
 plotly = "^5.15.0"
 imblearn = "^0.0"
 prefect = "^2.11.0"
+google-cloud-storage = "^2.10.0"
 
 
 [tool.poetry.group.dev.dependencies]
