@@ -2,9 +2,6 @@ import mlflow
 import pandas as pd
 from prefect import flow, get_run_logger, task
 
-from email_discriminator.core.model import DataProcessor
-
-# You might need to set your MLFlow tracking URI here if it's not already set
 mlflow.set_tracking_uri("http://localhost:5001/")
 
 
