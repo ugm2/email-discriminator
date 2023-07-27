@@ -30,7 +30,7 @@ class TextSelector(BaseEstimator, TransformerMixin):
         return X[self.key]
 
 
-class DataProcessor:
+class DataProcessor(BaseEstimator, TransformerMixin):
     """
     Data processor to fit and transform input data.
     """
@@ -52,12 +52,13 @@ class DataProcessor:
             [("article", self.text), ("section", self.section)]
         )
 
-    def fit_transform(self, X: DataFrame) -> ndarray:
+    def fit(self, X: DataFrame, y: ndarray = None):
         try:
-            return self.features.fit_transform(X)
+            self.features.fit(X, y)
         except Exception as e:
-            logging.error(f"Error fitting and transforming data: {e}")
+            logging.error(f"Error fitting data: {e}")
             raise e
+        return self
 
     def transform(self, X: DataFrame) -> ndarray:
         try:
@@ -65,3 +66,7 @@ class DataProcessor:
         except Exception as e:
             logging.error(f"Error transforming data: {e}")
             raise e
+
+    def fit_transform(self, X: DataFrame, y: ndarray = None):
+        self.fit(X, y)
+        return self.transform(X)
