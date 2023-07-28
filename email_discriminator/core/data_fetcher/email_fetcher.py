@@ -2,7 +2,6 @@ import base64
 import logging
 import os
 import pickle
-from contextlib import closing
 from typing import Callable, Dict, List
 
 from google.auth.transport.requests import Request
@@ -60,30 +59,40 @@ class EmailFetcher:
                     self.client_secret_path,
                     ["https://www.googleapis.com/auth/gmail.modify"],
                 )
-                with closing(flow.run_local_server(port=0)):
-                    creds = flow.run_local_server(port=0)
+                creds = flow.run_local_server(port=0)
             with open(self.creds_path, "wb") as token:
                 pickle.dump(creds, token)
         return build("gmail", "v1", credentials=creds)
 
-    def fetch_emails(self, query: str) -> List[Dict]:
+    def fetch_emails(self, query: str, max_results: int = None) -> List[Dict]:
         """
         Fetches emails based on a specific query.
 
         Args:
             query: The query to fetch the emails.
+            max_results: The maximum number of emails to fetch.
 
         Returns:
             A list of messages.
         """
+        all_emails = []
+        request = self.service.users().messages().list(userId="me", q=query)
 
-        return (
-            self.service.users()
-            .messages()
-            .list(userId="me", q=query)
-            .execute()
-            .get("messages", [])
-        )
+        while request is not None:
+            response = request.execute()
+            logger.debug(f"Response: {response}")
+            all_emails.extend(response.get("messages", []))
+            logger.debug(f"All emails: {all_emails}")
+
+            # If max_results is specified and we've fetched enough emails, break the loop.
+            if max_results is not None and len(all_emails) >= max_results:
+                logger.info("Breaking due to max_results")
+                break
+
+            request = self.service.users().messages().list_next(request, response)
+            logger.debug(f"Next request: {request}")
+
+        return all_emails[:max_results]
 
     def get_email_data(self, email_id: str) -> Dict:
         """
