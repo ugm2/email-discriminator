@@ -97,9 +97,8 @@ def predict(pipeline: PythonModel, data: DataFrame) -> pd.Series:
     """
     logger = get_run_logger()
     logger.info("Making predictions")
-    predictions = pipeline.predict(data)
     # Add the predictions to the DataFrame as a new column.
-    data["predicted_is_relevant"] = predictions
+    data["predicted_is_relevant"] = pipeline.predict(data)
     logger.info(data)
     return data
 
