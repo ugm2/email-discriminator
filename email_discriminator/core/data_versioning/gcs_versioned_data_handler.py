@@ -45,6 +45,13 @@ class GCSVersionedDataHandler:
         logger.info(f"Data downloaded from {gcs_file_path}.")
         return data
 
+    def move_file_string(self, gcs_file_path: str, new_gcs_file_path: str):
+        logger.info(f"Moving file from {gcs_file_path} to {new_gcs_file_path}...")
+        bucket = self.storage_client.get_bucket(self.bucket_name)
+        blob = bucket.blob(gcs_file_path)
+        blob.move_to(bucket.blob(new_gcs_file_path))
+        logger.info(f"File moved from {gcs_file_path} to {new_gcs_file_path}.")
+
     def upload_original_data(self, local_file_path: str):
         logger.info("Uploading original data...")
         self.upload_string(local_file_path, "data/original_data/tldr_articles.csv")
@@ -74,17 +81,25 @@ class GCSVersionedDataHandler:
     def upload_predicted_data(self, csv_string: str, data_hash: str):
         logger.info("Uploading predicted data...")
         self.upload_string(
-            csv_string, f"data/predicted_data/tldr_articles_{data_hash}.csv"
+            csv_string, f"data/predicted_data/new/tldr_articles_{data_hash}.csv"
         )
         logger.info("Predicted data uploaded.")
 
     def download_predicted_data(self, data_hash: str):
         logger.info("Downloading predicted data...")
         data = self.download_string(
-            f"data/predicted_data/tldr_articles_{data_hash}.csv"
+            f"data/predicted_data/new/tldr_articles_{data_hash}.csv"
         )
         logger.info("Predicted data downloaded.")
         return data
+
+    def move_predicted_data_to_old(self, data_hash: str):
+        logger.info("Moving predicted data to old data...")
+        self.move_file_string(
+            f"data/predicted_data/new/tldr_articles_{data_hash}.csv",
+            f"data/predicted_data/old/tldr_articles_{data_hash}.csv",
+        )
+        logger.info("Predicted data moved to old data.")
 
     def upload_training_data(self, csv_string: str, data_hash: str):
         logger.info("Uploading training data...")
@@ -122,8 +137,25 @@ class GCSVersionedDataHandler:
         logger.info("All training data downloaded.")
         return training_data_files
 
+    def download_new_predicted_data(self):
+        logger.info("Downloading new predicted data...")
+        bucket = self.storage_client.get_bucket(self.bucket_name)
+        blobs = bucket.list_blobs(prefix="data/predicted_data/new/")
 
-if __name__ == "__main__":
-    BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
-    gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
-    training_data_files = gcs_handler.download_all_training_data()
+        predicted_data_files = {}
+
+        for blob in blobs:
+            # Extract the data hash from the file name
+            file_name = blob.name
+            logging.debug(f"Downloading file {file_name}")
+            data_hash = file_name.split("_")[-1].replace(".csv", "")
+
+            # If the blob is not a file, skip it
+            if not file_name.endswith(".csv"):
+                continue
+
+            # Download the file as a string and add to the dictionary
+            predicted_data_files[data_hash] = blob.download_as_text()
+
+        logger.info("New predicted data downloaded.")
+        return predicted_data_files
