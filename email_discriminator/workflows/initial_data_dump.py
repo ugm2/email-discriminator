@@ -45,9 +45,7 @@ def fetch_data_flow(bucket_name: str) -> None:
     logger = get_run_logger()
     logger.info("Starting data fetching flow.")
 
-    fetcher = EmailFetcher()
-    parser = TLDRContentParser()
-    builder = EmailDatasetBuilder(fetcher, parser)
+    builder = EmailDatasetBuilder(EmailFetcher(), TLDRContentParser())
 
     # Create a GCSVersionedDataHandler instance.
     gcs_handler = GCSVersionedDataHandler(bucket_name)
