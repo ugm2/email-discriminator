@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 
 from prefect import flow, get_run_logger, task
 
@@ -16,7 +15,9 @@ BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
 
 
 @task(name="Fetch data")
-def fetch_data(builder, gcs_handler):
+def fetch_data(
+    builder: EmailDatasetBuilder, gcs_handler: GCSVersionedDataHandler
+) -> None:
     logger = get_run_logger()
     logger.info("Starting data fetching task.")
 
@@ -40,7 +41,7 @@ def fetch_data(builder, gcs_handler):
 
 
 @flow(name="fetch_data")
-def fetch_data_flow(bucket_name):
+def fetch_data_flow(bucket_name: str) -> None:
     logger = get_run_logger()
     logger.info("Starting data fetching flow.")
 
