@@ -1,4 +1,156 @@
 section,article,is_relevant
+MISCELLANEOUS,"IMPROVING FINANCIAL QUERIES WITH OPENBB AND LLAMAINDEX (4 MINUTE READ)
+[https://openbb.co/blog/breaking-barriers-with-openbb-and-llamaIndex?utm_source=tldrai]
+
+Instead of using a vector store to index directly over the data, you
+can use metadata and an existing query language to dramatically
+improve the quality of retrieved data. ",1
+MISCELLANEOUS,"RUST OR MOJO FOR THE FUTURE OF AI (8 MINUTE READ)
+[https://mojodojo.dev/blog/2023-07-17-rust-or-mojo-ai.html?utm_source=tldrai]
+
+This blog walks through the reimplementation of a thousand lines of
+C++ in an opencv function to a few lines of Mojo. They discuss the
+trade offs and speed ups. Mojo still doesn't have a local release, but
+it is expected to come soon. ",1
+MISCELLANEOUS,"THE BUILDING BLOCKS OF GENERATIVE AI (34 MINUTE READ)
+[https://shriftman.substack.com/p/the-building-blocks-of-generative?utm_source=tldrai]
+
+A nice, high-level discussion around the key components, emerging
+trends, and industry players working in generative AI. There’s lots
+of information here around foundation models, compute, frameworks,
+orchestration, fine-tuning, synthetic data, and more!",1
+QUICK LINKS,"OPENAI LAUNCHES CUSTOMIZED INSTRUCTIONS FOR CHATGPT (2 MINUTE READ)
+[https://techcrunch.com/2023/07/20/openai-launches-customized-instructions-for-chatgpt/?utm_source=tldrai]
+
+OpenAI just launched custom instructions for ChatGPT users, so they
+don’t have to write the same instruction prompts to the chatbot
+every time they interact with it. ",1
+QUICK LINKS,"GITHUB’S COPILOT CHAT IS NOW AVAILABLE IN PUBLIC BETA (1 MINUTE
+READ)
+[https://www.theverge.com/2023/7/20/23801498/github-copilot-x-chat-code-chatbot-public-beta?utm_source=tldrai]
+
+GitHub has announced that its new Copilot Chat feature — a
+ChatGPT-like experience designed to help developers with coding — is
+now available as a limited public beta for enterprise companies and
+organizations. ",1
+BIG TECH & STARTUPS,"CHATGPT CAN NOW REMEMBER WHO YOU ARE AND WHAT YOU WANT (3 MINUTE READ)
+[https://www.theverge.com/2023/7/20/23801520/chatgpt-openai-custom-instructions-chatbot?utm_source=tldrnewsletter]
+
+ChatGPT's new custom instructions feature lets users tell the chatbot
+things it should always know about them and how to answer questions.
+It is designed to make ChatGPT quicker and more helpful as a virtual
+assistant. Custom Instructions is available now for ChatGPT Plus
+subscribers everywhere but the UK and EU on an opt-in basis. The
+feature is still in beta. It works everywhere that ChatGPT does. ",1
+BIG TECH & STARTUPS,"MICROSOFT GOES BEYOND OPENAI, MAKES META'S NEW A.I. MODEL AVAILABLE TO
+AZURE CUSTOMERS (2 MINUTE READ)
+[https://www.cnbc.com/2023/07/18/microsoft-makes-metas-new-ai-model-available-to-azure-customers.html?utm_source=tldrnewsletter]
+
+Microsoft is making Meta's Llama 2 model available on its Azure cloud
+computing service. Meta said in a blog post that Microsoft is its
+preferred partner for Llama 2. The partnership will give developers
+more choice in the models they build on. Meta says that it is not
+focused on monetization for Llama 2. Llama 2 will also be available
+through Amazon web services and Hugging Face.",1
+SCIENCE & FUTURISTIC TECHNOLOGY,"FED SET TO LAUNCH LONG-AWAITED INSTANT PAYMENTS SERVICE, MODERNIZING
+SYSTEM (2 MINUTE READ)
+[https://www.reuters.com/business/finance/fed-set-launch-long-awaited-instant-payments-service-modernizing-system-2023-07-20/?utm_source=tldrnewsletter]
+
+The US Federal Reserve is set to launch FedNow, a service that will
+allow US citizens to send and receive funds in seconds. FedNow has
+been in the works since 2019. It will launch with 41 banks and 15
+service providers, with more banks and credit unions to be onboarded
+later this year. FedNow payments will settle directly in central bank
+accounts. There will be no fees from FedNow to use the service. FedNow
+has a maximum payment limit of $500,000, but banks can choose to lower
+that cap if required.",1
+SCIENCE & FUTURISTIC TECHNOLOGY,"TEACHING ROBOTS TO TEACH OTHER ROBOTS (4 MINUTE READ)
+[https://viterbischool.usc.edu/news/2023/07/teaching-robots-to-teach-other-robots/?utm_source=tldrnewsletter]
+
+Lifelong Learning (LL) is a growing area of machine learning research
+in which AI agents continually learn as they encounter new tasks while
+retaining knowledge of previous tasks. A team of LL researchers
+recently discovered that AI agents can quickly learn a wide range of
+tasks by sharing knowledge with each other at the same time. Their
+system has many similarities with the concept of crowdsourcing. The
+researchers believe that their technique could transform any field
+that requires vast, diverse knowledge or dealing with complex systems.",1
+"PROGRAMMING, DESIGN & DATA SCIENCE","PS: QA Wolf currently has a 4.8/5 ⭐ rating on G2 as reviewed by
+companies with 51-1000+ employees.
+
+GITHUB COPILOT CHAT BETA NOW AVAILABLE FOR EVERY ORGANIZATION (4
+MINUTE READ)
+[https://github.blog/2023-07-20-github-copilot-chat-beta-now-available-for-every-organization/?utm_source=tldrnewsletter]",1
+"PROGRAMMING, DESIGN & DATA SCIENCE","A limited public beta release of GitHub Copilot Chat is now available
+to enterprise companies and organizations on Visual Studio and VS
+Code. GitHub Copilot Chat turns GitHub Pilot into a context-aware
+conversational assistant, allowing developers to execute tasks with
+prompts. The feature will help developers create much faster and
+democratize software development as we know it. Information on how
+organization admins can enable the feature is available in the
+article.
+
+OLLAMA (GITHUB REPO)
+[https://github.com/jmorganca/ollama?utm_source=tldrnewsletter]",1
+MISCELLANEOUS,"HOW NETFLIX CAN END THE HOLLYWOOD STRIKE IN A WAY DISNEY, PARAMOUNT
+CAN'T AFFORD (10 MINUTE READ)
+[https://www.cnbc.com/2023/07/20/how-netflix-can-end-the-hollywood-strike-in-a-way-disney-cant-afford.html?utm_source=tldrnewsletter]
+
+Netflix is in better financial shape than its industry rivals and can
+make better deals. It will likely not be affected by ongoing strikes
+in Hollywood by writers and actors. Netflix could force a settlement
+to the strikes before its rivals get back to business. Wall Street
+analysts estimate that Netflix will be earning up to $9.5 billion
+annually by 2025.",1
+MISCELLANEOUS,"AI COMPANIES WILL REPORTEDLY COMMIT TO SAFEGUARDS AT THE WHITE HOUSE'S
+REQUEST (2 MINUTE READ)
+[https://www.engadget.com/ai-companies-will-reportedly-commit-to-safeguards-at-the-white-houses-request-185646283.html?utm_source=tldrnewsletter]
+
+Several companies, including Microsoft, Google, and OpenAI, have
+committed to certain safeguards for their technology until Congress
+passes legislation to regulate AI. Officials want to make sure that
+the technology is developed responsibly and in a way that benefits
+society without negatively impacting the safety, rights, and
+democratic values of the public. The tech firms have agreed to eight
+measures, including letting independent experts test models for bad
+behavior, investing in cybersecurity, flagging societal risks, and
+watermarking AI-generated audio and visual content. A full list of the
+measures is available in the article.",1
+QUICK LINKS,"GOOGLE DEMOS “UNSETTLING” TOOL TO HELP JOURNALISTS WRITE THE NEWS
+(2 MINUTE READ)
+[https://arstechnica.com/information-technology/2023/07/google-demos-unsettling-tool-to-help-journalists-write-the-news/?utm_source=tldrnewsletter]
+
+Some journalists think that Google's Genesis assistant can be misused
+and cause damage to the organizations that use it.",1
+QUICK LINKS,"GITID (GITHUB REPO)
+[https://github.com/InderdeepBajwa/gitid?utm_source=tldrnewsletter]
+
+GitID is a command-line tool that can manage and switch between
+multiple git SSH identities on a single user account.",1
+QUICK LINKS,"TWITTER IS PREPPING A JOB LISTINGS FEATURE FOR VERIFIED ORGANIZATIONS
+(2 MINUTE READ)
+[https://techcrunch.com/2023/07/20/twitter-prepping-job-listings-feature-verified-organizations/?utm_source=tldrnewsletter]
+
+While the feature hasn't been officially released, some verified
+organizations have been able to post job listings already.",1
+QUICK LINKS,"WHAT'S NEW IN CHROME 116 FOR EXTENSIONS (5 MINUTE READ)
+[https://developer.chrome.com/en/blog/chrome-116-beta-whats-new-for-extensions/?utm_source=tldrnewsletter]
+
+Chrome extensions in Chrome 116 will allow developers to
+programmatically open a Sidepanel, record audio and video in the
+background, keep service workers alive for longer, and much more.",1
+QUICK LINKS,"THE AI WARS MIGHT HAVE AN ARMISTICE DEAL SOONER THAN EXPECTED (4
+MINUTE READ)
+[https://www.theverge.com/2023/7/20/23800755/ai-meta-llama-microsoft-chatgpt-interoperability?utm_source=tldrnewsletter]
+
+Meta's recent deal with Microsoft to bring LLaMA to Microsoft's Azure
+platform suggests that the industry may see a growing number of
+partnerships, not just head-to-head competition.",1
+QUICK LINKS,"UNSHACKLE (GITHUB REPO)
+[https://github.com/Fadi002/unshackle?utm_source=tldrnewsletter]
+
+Unshackle is a tool that can bypass Windows and Linux user passwords
+from a bootable USB.",1
 BIG TECH & STARTUPS,"TESLA IN DISCUSSION TO LICENSE FULL SELF-DRIVING SOFTWARE TO ANOTHER
 AUTOMAKER (2 MINUTE READ)
 [https://www.theverge.com/2023/7/19/23800972/tesla-fsd-license-car-company-driver-assist?utm_source=tldrnewsletter]

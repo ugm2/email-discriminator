@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, call, mock_open, patch
 
 import pytest
 
@@ -24,11 +24,57 @@ def test_get_service(mock_exists, mock_load, mock_flow, mock_build, mock_open):
 
 @patch.object(EmailFetcher, "get_service", return_value=MagicMock())
 def test_fetch_emails(mock_get_service):
-    mock_get_service.return_value.users.return_value.messages.return_value.list.return_value.execute.return_value = {
-        "messages": "Emails"
-    }
+    mock_service = mock_get_service.return_value
+    mock_list_method = mock_service.users.return_value.messages.return_value.list
+    mock_list_next_method = (
+        mock_service.users.return_value.messages.return_value.list_next
+    )
+
+    # Define a generator function that will be used as the side_effect for execute.
+    def execute_side_effect():
+        yield {"messages": ["Email1", "Email2", "Email3"]}  # First page
+        yield {"messages": ["Email4", "Email5"]}  # Second page
+        while True:  # Ensure we don't raise StopIteration
+            yield {"messages": []}
+
+    # Set the side_effect of execute to the generator function.
+    mock_list_method.return_value.execute.side_effect = execute_side_effect()
+
+    # Simulate the list_next method.
+    mock_list_next_method.side_effect = lambda x, y: (
+        mock_service.users.return_value.messages.return_value.list.return_value  # Second page
+        if y.get("messages") == ["Email1", "Email2", "Email3"]
+        else None  # No more pages
+    )
+
     fetcher = EmailFetcher()
-    assert fetcher.fetch_emails("label:TLDRs") == "Emails"
+
+    # Test without specifying max_results.
+    emails = fetcher.fetch_emails("label:TLDRs")
+    assert emails == ["Email1", "Email2", "Email3", "Email4", "Email5"]
+    assert mock_list_method.call_args_list == [call(userId="me", q="label:TLDRs")]
+
+    # Reset the mocks.
+    mock_list_method.reset_mock()
+    mock_list_next_method.reset_mock()
+
+    # Reset the side effect.
+    mock_list_method.return_value.execute.side_effect = execute_side_effect()
+
+    # Test with max_results.
+    emails = fetcher.fetch_emails("label:TLDRs", max_results=3)
+    assert emails == ["Email1", "Email2", "Email3"]
+    assert mock_list_method.call_args_list == [call(userId="me", q="label:TLDRs")]
+
+    # Reset the mocks.
+    mock_list_method.reset_mock()
+    mock_list_next_method.reset_mock()
+
+    # TODO: Test with max_results greater than the total number of emails.
+    # emails = fetcher.fetch_emails("label:TLDRs", max_results=10)
+    # print(f"Emails with max_results=10: {emails}")
+    # assert emails == ["Email1", "Email2", "Email3", "Email4", "Email5"]
+    # assert mock_list_method.call_args_list == [call(userId="me", q="label:TLDRs")]
 
 
 @patch.object(EmailFetcher, "get_service", return_value=MagicMock())

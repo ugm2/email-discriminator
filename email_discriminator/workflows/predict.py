@@ -1,5 +1,7 @@
+import hashlib
+import io
 import os
-from typing import Dict, Union
+from datetime import datetime
 
 import mlflow
 import pandas as pd
@@ -7,23 +9,69 @@ from mlflow.pyfunc import PythonModel
 from pandas import DataFrame
 from prefect import flow, get_run_logger, task
 
-# Configuration Management
+from email_discriminator.core.data_fetcher import (
+    EmailDatasetBuilder,
+    EmailFetcher,
+    TLDRContentParser,
+)
+from email_discriminator.core.data_versioning import GCSVersionedDataHandler
+
 # Fetching configurations from environment variables
 MLFLOW_URI = os.getenv("MLFLOW_URI", "http://localhost:5000/")
-DATA_PATH = os.getenv("DATA_PATH", "data/tldr_articles.csv")
+DATA_PATH = os.getenv("DATA_PATH", "data/")
 MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
+BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
 
 mlflow.set_tracking_uri(MLFLOW_URI)
 
 
 @task
-def load_data(file_path: str) -> DataFrame:
+def fetch_unread_emails(builder: EmailDatasetBuilder) -> DataFrame:
     """
-    Load data from a CSV file.
+    Fetch unread emails and return them as a DataFrame.
     """
     logger = get_run_logger()
-    logger.info(f"Loading data from {file_path}")
-    df = pd.read_csv(file_path)
+    logger.info("Fetching unread emails.")
+    df = builder.create_predict_dataframe("from:dan@tldrnewsletter.com is:unread")
+    logger.info(f"Fetched unread emails with shape {df.shape}")
+    return df
+
+
+@task
+def upload_unread_emails(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -> str:
+    """
+    Upload unread emails to Google Cloud Storage and return the timestamp.
+    """
+    logger = get_run_logger()
+    logger.info("Uploading unread emails to Google Cloud Storage.")
+
+    # Calculate the hash of the data content.
+    data_hash = hashlib.sha256(df.to_string().encode()).hexdigest()[:10]
+
+    # Convert the DataFrame to a CSV string.
+    csv_string = df.to_csv(index=False)
+
+    # Upload the CSV string to GCS.
+    gcs_handler.upload_unlabelled_data(csv_string, data_hash)
+
+    logger.info(f"Uploaded unread emails to GCS with data_hash {data_hash}.")
+    return data_hash
+
+
+@task
+def load_data(gcs_handler: GCSVersionedDataHandler, data_hash: str) -> DataFrame:
+    """
+    Load data from a CSV file in Google Cloud Storage.
+    """
+    logger = get_run_logger()
+    logger.info(f"Loading data from unlabelled data with data_hash {data_hash}")
+
+    # Download the CSV string from GCS.
+    csv_string = gcs_handler.download_unlabelled_data(data_hash)
+
+    # Load the CSV string into a DataFrame.
+    df = pd.read_csv(io.StringIO(csv_string))
+
     logger.info(f"Loaded data with shape {df.shape}")
     return df
 
@@ -49,20 +97,63 @@ def predict(pipeline: PythonModel, data: DataFrame) -> pd.Series:
     """
     logger = get_run_logger()
     logger.info("Making predictions")
-    return pipeline.predict(data)
+    predictions = pipeline.predict(data)
+    # Add the predictions to the DataFrame as a new column.
+    data["predicted_is_relevant"] = predictions
+    logger.info(data)
+    return data
+
+
+@task
+def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -> str:
+    """
+    Upload the predictions to Google Cloud Storage.
+    """
+    logger = get_run_logger()
+    logger.info("Uploading predictions to Google Cloud Storage")
+
+    # Calculate the hash of the data content.
+    data_hash = hashlib.sha256(df.to_string().encode()).hexdigest()[:10]
+
+    # Convert the DataFrame to a CSV string.
+    csv_string = df.to_csv(index=False)
+
+    # Upload the CSV string to GCS.
+    gcs_handler.upload_predicted_data(csv_string, data_hash)
+
+    logger.info(f"Uploaded predictions to GCS with data_hash {data_hash}.")
+    return data_hash
 
 
 @flow
 def predict_flow() -> None:
     """
-    The main flow for loading data, loading a model, and making predictions.
+    The main flow for fetching emails, loading data, loading a model, and making predictions.
     """
     logger = get_run_logger()
     logger.info("Starting prediction flow")
-    df = load_data(DATA_PATH)
+
+    # Create a GCSVersionedDataHandler instance.
+    gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
+
+    # Create a EmailDatasetBuilder instance.
+    builder = EmailDatasetBuilder(EmailFetcher(), TLDRContentParser())
+
+    # Fetch unread emails and upload them to GCS.
+    unread_emails = fetch_unread_emails(builder)
+    data_hash = upload_unread_emails(unread_emails, gcs_handler)
+
+    # Load the unlabelled data.
+    df = load_data(gcs_handler, data_hash)
+
+    # Load the model pipeline.
     pipeline = load_pipeline(MODEL_NAME)
-    predictions = predict(pipeline, df)
-    logger.info(predictions)
+
+    # Make predictions.
+    predicted_data = predict(pipeline, df)
+
+    # Upload the predictions to GCS.
+    data_hash = upload_predicted_data(predicted_data, gcs_handler)
 
 
 if __name__ == "__main__":

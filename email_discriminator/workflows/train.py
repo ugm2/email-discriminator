@@ -1,5 +1,6 @@
+import io
 import os
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Optional, Tuple
 
 import mlflow
 import pandas as pd
@@ -10,30 +11,56 @@ from prefect.artifacts import create_table_artifact
 from sklearn.metrics import classification_report, make_scorer, recall_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 
+from email_discriminator.core.data_versioning import GCSVersionedDataHandler
 from email_discriminator.core.model import DataProcessor, Model
 
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000/")
+MLFLOW_URI = os.getenv("MLFLOW_URI", "http://localhost:5000/")
 DATA_PATH = os.getenv("DATA_PATH", "data/tldr_articles.csv")
 MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
+BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
+MODEL_STAGE = os.getenv("MODEL_STAGE", None)
 
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment(MODEL_NAME)
 
 
 @task
-def load_data(file_path: str) -> pd.DataFrame:
+def load_data(gcs_handler: GCSVersionedDataHandler) -> pd.DataFrame:
     """
-    Loads the data from a given file path.
+    Loads the original data and all the training data from GCS.
 
     Args:
-        file_path: The path to the data file.
+        gcs_handler: GCSVersionedDataHandler instance.
 
     Returns:
         A pandas DataFrame containing the loaded data.
     """
     logger = get_run_logger()
-    logger.info(f"Loading data from {file_path}")
-    df = pd.read_csv(file_path)
+    logger.info("Loading original and training data from GCS")
+
+    # Load original data
+    csv_string = gcs_handler.download_original_data()
+    original_data = pd.read_csv(io.StringIO(csv_string))
+    logger.info("Original data shape: {}".format(original_data.shape))
+    logger.debug(original_data.head())
+
+    # Load all training data
+    training_data_files = gcs_handler.download_all_training_data()
+    logger.info("Number of training data files: {}".format(len(training_data_files)))
+    training_data_dfs = []
+    for csv in training_data_files.values():
+        df = pd.read_csv(io.StringIO(csv))
+        df.drop(columns=["predicted_is_relevant", "Unnamed: 0"], inplace=True)
+        logger.info(f"Loaded training data with shape {df.shape}")
+        logger.debug(df.head())
+        training_data_dfs.append(df)
+    logger.info(
+        "Number of training data files loaded: {}".format(len(training_data_dfs))
+    )
+
+    # Concatenate all dataframes together
+    df = pd.concat([original_data] + training_data_dfs, ignore_index=True)
+
     logger.info(f"Loaded data with shape {df.shape}")
     return df
 
@@ -103,7 +130,7 @@ def evaluation(
 
 @task
 def log_metrics_and_model(
-    report: Dict, grid_search: GridSearchCV, model_name: str
+    report: Dict, grid_search: GridSearchCV, model_name: str, model_stage: Optional[str]
 ) -> None:
     """
     Logs metrics and model to MLFlow, registers the model, and logs model version as a Prefect artifact.
@@ -166,9 +193,10 @@ def log_metrics_and_model(
     model_uri = f"runs:/{run_id}/model"
     model_version = mlflow.register_model(model_uri, model_name)
     client = mlflow.tracking.MlflowClient()
-    client.transition_model_version_stage(
-        name=model_name, version=model_version.version, stage="Production"
-    )
+    if model_stage is not None:
+        client.transition_model_version_stage(
+            name=model_name, version=model_version.version, stage=model_stage
+        )
 
     # Log model version in prefect as an artifact
     model_version_details = {
@@ -176,7 +204,7 @@ def log_metrics_and_model(
         "version": model_version.version,
         "creation_timestamp": model_version.creation_timestamp,
         "last_updated_timestamp": model_version.last_updated_timestamp,
-        "current_stage": "Production",
+        "current_stage": model_version.status if model_stage is None else model_stage,
         "description": model_version.description,
         "user_id": model_version.user_id,
         "source": model_version.source,
@@ -201,13 +229,26 @@ def train_flow() -> None:
     """
     logger = get_run_logger()
     logger.info("Starting training flow")
-    df = load_data(DATA_PATH)
+
+    # Create a GCSVersionedDataHandler instance
+    gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
+
+    # Load and split the data
+    df = load_data(gcs_handler)
     X_train, X_test, y_train, y_test = split_data(df)
+
+    # Create pipeline and grid search
     pipeline = load_pipeline()
     grid_search = create_grid_search(pipeline)
+
+    # Train
     fit(grid_search, X_train, y_train)
+
+    # Evaluate
     report = evaluation(grid_search, X_test, y_test)
-    log_metrics_and_model(report, grid_search, MODEL_NAME)
+
+    # Log metrics and model
+    log_metrics_and_model(report, grid_search, MODEL_NAME, MODEL_STAGE)
 
 
 if __name__ == "__main__":
