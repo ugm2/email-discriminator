@@ -23,11 +23,10 @@ def get_relevant_df(df: pd.DataFrame, show_all: bool) -> pd.DataFrame:
     """
     Returns a dataframe containing only the relevant rows, unless show_all is True.
     """
-    if not show_all:
-        relevant_df = df[(df["predicted_is_relevant"] == True)]
+    if show_all:
+        return df
     else:
-        relevant_df = df
-    return relevant_df
+        return df[df["predicted_is_relevant"]]
 
 
 def update_df(index: int, predicted_is_relevant: bool, row: pd.Series) -> bool:
