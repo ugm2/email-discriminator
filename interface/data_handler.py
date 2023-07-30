@@ -21,9 +21,7 @@ def split_dataframe(df: pd.DataFrame, end_index: int) -> (pd.DataFrame, pd.DataF
     """
     Splits the dataframe into "reviewed" and "unreviewed" datasets.
     """
-    reviewed_df = df.iloc[:end_index]
-    unreviewed_df = df.iloc[end_index:]
-    return reviewed_df, unreviewed_df
+    return df.iloc[:end_index], df.iloc[end_index:]
 
 
 def upload_reviewed_data(
