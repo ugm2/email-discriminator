@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "email_discriminator"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.9.7 || >3.9.7,<3.12"
 google-auth-oauthlib = "^1.0.0"
 google-api-python-client = "^2.93.0"
 rich = "^13.4.2"
@@ -33,6 +33,11 @@ matplotlib = "^3.7.2"
 jupyter = "^1.0.0"
 ipykernel = "^6.24.0"
 seaborn = "^0.12.2"
+
+
+[tool.poetry.group.interface.dependencies]
+streamlit = "^1.25.0"
+watchdog = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -17,7 +17,7 @@ from email_discriminator.core.data_fetcher import (
 from email_discriminator.core.data_versioning import GCSVersionedDataHandler
 
 # Fetching configurations from environment variables
-MLFLOW_URI = os.getenv("MLFLOW_URI", "http://localhost:5000/")
+MLFLOW_URI = os.getenv("MLFLOW_URI", "http://35.206.147.175:5000")
 DATA_PATH = os.getenv("DATA_PATH", "data/")
 MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
 BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
@@ -118,7 +118,7 @@ def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -
     csv_string = df.to_csv(index=False)
 
     # Upload the CSV string to GCS.
-    gcs_handler.upload_predicted_data(csv_string, data_hash)
+    gcs_handler.upload_predicted_data(csv_string, data_hash, "new/")
 
     logger.info(f"Uploaded predictions to GCS with data_hash {data_hash}.")
     return data_hash

@@ -14,7 +14,7 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from email_discriminator.core.data_versioning import GCSVersionedDataHandler
 from email_discriminator.core.model import DataProcessor, Model
 
-MLFLOW_URI = os.getenv("MLFLOW_URI", "http://localhost:5000/")
+MLFLOW_URI = os.getenv("MLFLOW_URI", "http://35.206.147.175:5000")
 DATA_PATH = os.getenv("DATA_PATH", "data/tldr_articles.csv")
 MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
 BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
