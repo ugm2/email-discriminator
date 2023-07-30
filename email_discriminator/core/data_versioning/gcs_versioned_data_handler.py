@@ -78,10 +78,10 @@ class GCSVersionedDataHandler:
         logger.info("Unlabelled data downloaded.")
         return data
 
-    def upload_predicted_data(self, csv_string: str, data_hash: str):
+    def upload_predicted_data(self, csv_string: str, data_hash: str, folder: str):
         logger.info("Uploading predicted data...")
         self.upload_string(
-            csv_string, f"data/predicted_data/new/tldr_articles_{data_hash}.csv"
+            csv_string, f"data/predicted_data/{folder}tldr_articles_{data_hash}.csv"
         )
         logger.info("Predicted data uploaded.")
 
@@ -159,3 +159,10 @@ class GCSVersionedDataHandler:
 
         logger.info("New predicted data downloaded.")
         return predicted_data_files
+
+    def delete_predicted_file(self, data_hash: str):
+        logger.info(f"Deleting file {data_hash}...")
+        bucket = self.storage_client.get_bucket(self.bucket_name)
+        blob = bucket.blob(f"data/predicted_data/new/tldr_articles_{data_hash}.csv")
+        blob.delete()
+        logger.info(f"File {data_hash} deleted.")

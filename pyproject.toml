@@ -37,6 +37,7 @@ seaborn = "^0.12.2"
 
 [tool.poetry.group.interface.dependencies]
 streamlit = "^1.25.0"
+watchdog = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
