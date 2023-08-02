@@ -1,0 +1,48 @@
+# Welcome to your prefect.yaml file! You can you this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: email-discriminator
+prefect-version: 2.11.0
+
+# build section allows you to manage and build docker images
+build:
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push:
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+    repository: https://github.com/ugm2/email-discriminator.git
+    branch: main
+    access_token:
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name:
+  version:
+  tags: []
+  description:
+  schedule: {}
+  flow_name:
+  entrypoint:
+  parameters: {}
+  work_pool:
+    name:
+    work_queue_name:
+    job_variables: {}
+- name: predict_flow_deployment
+  version:
+  tags: []
+  description: The main flow for fetching emails, loading data, loading a model, and
+    making predictions.
+  entrypoint:
+    .tox/lint/lib/python3.10/site-packages/email_discriminator/workflows/predict.py:predict_flow
+  parameters: {}
+  work_pool:
+    name: google-pool
+    work_queue_name:
+    job_variables: {}
+  schedule:

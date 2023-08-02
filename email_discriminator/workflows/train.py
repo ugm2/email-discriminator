@@ -221,7 +221,7 @@ def log_metrics_and_model(
     )
 
 
-@flow
+@flow(name="train-flow")
 def train_flow() -> None:
     """
     The main flow for training the model, includes loading data, splitting it, creating and fitting a pipeline,

@@ -124,7 +124,7 @@ def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -
     return data_hash
 
 
-@flow
+@flow(name="predict-flow")
 def predict_flow() -> None:
     """
     The main flow for fetching emails, loading data, loading a model, and making predictions.

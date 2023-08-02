@@ -49,3 +49,10 @@ The approach to solving this problem involves several steps:
 4. **Model as Service**: Code refactoring and creation of a batch model service.
 
 5. **Model Deployment**: Deploying the model to a production environment where it can make predictions on new, unseen TLDRs.
+
+
+### Deployment procedure
+
+1. `prefect init` to create a new prefect project.
+
+2. `prefect deploy` to deploy flows.

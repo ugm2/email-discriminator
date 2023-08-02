@@ -3358,6 +3358,31 @@ websockets = ">=10.4"
 dev = ["cairosvg", "flaky", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
 
 [[package]]
+name = "prefect-gcp"
+version = "0.4.5"
+description = "Prefect tasks and subflows for interacting with Google Cloud Platform."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "prefect-gcp-0.4.5.tar.gz", hash = "sha256:b99171dd13518e2776ced3bc035b512b53d7e170ec5362dbeddcf87fef8ee74c"},
+    {file = "prefect_gcp-0.4.5-py3-none-any.whl", hash = "sha256:24ac81a326327258d0e1a3e88f20a44ab781ca4dd4320338222a29c515b391e8"},
+]
+
+[package.dependencies]
+google-api-python-client = ">=2.20.0"
+google-cloud-storage = ">=2.0.0"
+prefect = ">=2.10.17"
+tenacity = ">=8.0.0"
+
+[package.extras]
+aiplatform = ["google-cloud-aiplatform"]
+all-extras = ["google-cloud-aiplatform", "google-cloud-bigquery", "google-cloud-bigquery-storage", "google-cloud-secret-manager", "google-cloud-storage"]
+bigquery = ["google-cloud-bigquery", "google-cloud-bigquery-storage"]
+cloud-storage = ["google-cloud-storage"]
+dev = ["black", "coverage", "flake8", "google-cloud-aiplatform", "google-cloud-bigquery", "google-cloud-bigquery-storage", "google-cloud-secret-manager", "google-cloud-storage", "interrogate", "isort", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings[python]", "mock", "mypy", "pandas", "pillow", "pre-commit", "pyarrow", "pytest", "pytest-asyncio"]
+secret-manager = ["google-cloud-secret-manager"]
+
+[[package]]
 name = "prometheus-client"
 version = "0.17.1"
 description = "Python client for the Prometheus monitoring system."
@@ -5366,4 +5391,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.9.7 || >3.9.7,<3.12"
-content-hash = "6c1c249562b99edb8dd44d1a8e492a477e64b62215ec4594a77dc61c47ff1bf2"
+content-hash = "7701b145a3b4c7328ceefeb7fb768ce0387685c0190e2a6aa6b1670edec5ca0b"
