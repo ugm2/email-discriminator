@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import List, Tuple
 
 import pandas as pd
 from rich.logging import RichHandler
@@ -66,7 +67,7 @@ class EmailDatasetBuilder:
 
         return pd.concat([relevant_df, irrelevant_df], ignore_index=True)
 
-    def create_predict_dataframe(self, query: str) -> pd.DataFrame:
+    def create_predict_dataframe(self, query: str) -> Tuple[pd.DataFrame, List[str]]:
         """
         Creates a prediction dataframe with unlabeled data.
 
@@ -74,7 +75,8 @@ class EmailDatasetBuilder:
         query: Query string to fetch emails.
 
         Returns:
-        A DataFrame containing articles extracted from the fetched emails.
+        A tuple containing a DataFrame of articles extracted from the fetched emails
+        and a list of email ids corresponding to those articles.
         """
         try:
             unread_emails = self.fetcher.fetch_emails(query)
@@ -89,5 +91,5 @@ class EmailDatasetBuilder:
         except Exception as e:
             logger.error(f"Failed to get articles from emails due to {str(e)}")
             raise
-
-        return pd.DataFrame(articles)
+        email_ids = [email["id"] for email in unread_emails]
+        return pd.DataFrame(articles), email_ids

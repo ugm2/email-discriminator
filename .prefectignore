@@ -39,3 +39,11 @@ dask-worker-space/
 # VCS
 .git/
 .hg/
+
+mlartifacts/
+mlruns/
+.tox/
+.vscode/
+*cache/
+client_secret.json
+.coverage

@@ -19,6 +19,7 @@ imblearn = "^0.0"
 prefect = "^2.11.0"
 google-cloud-storage = "^2.10.0"
 prefect-gcp = "^0.4.5"
+gcsfs = "^2023.6.0"
 
 
 [tool.poetry.group.dev.dependencies]

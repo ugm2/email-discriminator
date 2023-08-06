@@ -136,3 +136,23 @@ def test_get_articles_from_emails(mock_get_service, mock_get_body, mock_get_emai
 
     mock_get_email_data.assert_called()
     mock_get_body.assert_called()
+
+
+@patch.object(EmailFetcher, "get_service", return_value=MagicMock())
+def test_delete_emails(mock_get_service):
+    mock_service = mock_get_service.return_value
+    mock_batch_delete_method = (
+        mock_service.users.return_value.messages.return_value.batchDelete
+    )
+    mock_batch_delete_method.return_value.execute.return_value = "Result"
+
+    fetcher = EmailFetcher()
+
+    email_ids = ["id1", "id2", "id3"]
+    result = fetcher.delete_emails(email_ids)
+
+    assert result == "Result"
+
+    mock_batch_delete_method.assert_called_once_with(
+        userId="me", body={"ids": email_ids}
+    )

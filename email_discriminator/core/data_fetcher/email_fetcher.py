@@ -175,3 +175,25 @@ class EmailFetcher:
             content = self.get_body(email_data)
             articles += content_parser(content)
         return articles
+
+    def delete_emails(self, email_ids: List[str]) -> Dict:
+        """
+        Deletes emails from the user's Gmail account.
+
+        Args:
+            email_ids: A list of email IDs.
+
+        Returns:
+            A dictionary containing the API response.
+        """
+
+        batch_delete_body = {"ids": email_ids}
+        result = (
+            self.service.users()
+            .messages()
+            .batchDelete(userId="me", body=batch_delete_body)
+            .execute()
+        )
+
+        logger.info(f"Deleted {len(email_ids)} emails.")
+        return result

@@ -2,6 +2,7 @@ import hashlib
 import io
 import os
 from datetime import datetime
+from typing import List, Tuple
 
 import mlflow
 import pandas as pd
@@ -26,15 +27,17 @@ mlflow.set_tracking_uri(MLFLOW_URI)
 
 
 @task
-def fetch_unread_emails(builder: EmailDatasetBuilder) -> DataFrame:
+def fetch_unread_emails(builder: EmailDatasetBuilder) -> Tuple[pd.DataFrame, List[str]]:
     """
     Fetch unread emails and return them as a DataFrame.
     """
     logger = get_run_logger()
     logger.info("Fetching unread emails.")
-    df = builder.create_predict_dataframe("from:dan@tldrnewsletter.com is:unread")
+    df, email_ids = builder.create_predict_dataframe(
+        "from:dan@tldrnewsletter.com is:unread"
+    )
     logger.info(f"Fetched unread emails with shape {df.shape}")
-    return df
+    return df, email_ids
 
 
 @task
@@ -56,6 +59,21 @@ def upload_unread_emails(df: DataFrame, gcs_handler: GCSVersionedDataHandler) ->
 
     logger.info(f"Uploaded unread emails to GCS with data_hash {data_hash}.")
     return data_hash
+
+
+@task
+def delete_emails(email_fetcher: EmailFetcher, email_ids: List[str]) -> None:
+    """
+    Deletes emails using the provided EmailFetcher.
+
+    Args:
+        email_fetcher: An EmailFetcher object.
+        email_ids: A list of email IDs.
+    """
+    logger = get_run_logger()
+    logger.info("Deleting emails")
+    email_fetcher.delete_emails(email_ids)
+    logger.info("Deleted emails")
 
 
 @task
@@ -125,7 +143,7 @@ def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -
 
 
 @flow(name="predict-flow")
-def predict_flow() -> None:
+def predict_flow(do_delete_emails: bool) -> None:
     """
     The main flow for fetching emails, loading data, loading a model, and making predictions.
     """
@@ -136,11 +154,16 @@ def predict_flow() -> None:
     gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
 
     # Create a EmailDatasetBuilder instance.
-    builder = EmailDatasetBuilder(EmailFetcher(), TLDRContentParser())
+    email_fetcher = EmailFetcher()
+    builder = EmailDatasetBuilder(email_fetcher, TLDRContentParser())
 
     # Fetch unread emails and upload them to GCS.
-    unread_emails = fetch_unread_emails(builder)
+    unread_emails, email_ids = fetch_unread_emails(builder)
     data_hash = upload_unread_emails(unread_emails, gcs_handler)
+
+    # Delete emails from the user's Gmail account.
+    if do_delete_emails:
+        delete_emails(email_fetcher, email_ids)
 
     # Load the unlabelled data.
     df = load_data(gcs_handler, data_hash)
@@ -156,4 +179,5 @@ def predict_flow() -> None:
 
 
 if __name__ == "__main__":
-    predict_flow()
+    # For test purposes we don't delete emails from the user's Gmail account.
+    predict_flow(do_delete_emails=False)

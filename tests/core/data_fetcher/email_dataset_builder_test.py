@@ -38,15 +38,22 @@ def test_create_training_dataframe(email_dataset_builder, fetcher_mock, parser_m
 
 def test_create_predict_dataframe(email_dataset_builder, fetcher_mock, parser_mock):
     # Mock the behavior of fetcher and parser
-    fetcher_mock.fetch_emails.return_value = ["email1", "email2"]
+    fetcher_mock.fetch_emails.return_value = [
+        {"id": "id1", "content": "email1"},
+        {"id": "id2", "content": "email2"},
+    ]
     fetcher_mock.get_articles_from_emails.return_value = ["article1", "article2"]
     parser_mock.parse_content.return_value = ["parsed_article1", "parsed_article2"]
 
-    df = email_dataset_builder.create_predict_dataframe("query")
+    df, email_ids = email_dataset_builder.create_predict_dataframe("query")
 
     # Verify the returned dataframe
     assert isinstance(df, pd.DataFrame)
     assert "is_relevant" not in df.columns
+
+    # Verify the returned email ids
+    assert isinstance(email_ids, list)
+    assert email_ids == ["id1", "id2"]
 
 
 @patch("email_discriminator.core.data_fetcher.email_dataset_builder.logger")

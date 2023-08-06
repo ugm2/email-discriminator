@@ -53,6 +53,12 @@ The approach to solving this problem involves several steps:
 
 ### Deployment procedure
 
+https://medium.com/@danilo.drobac/7-a-complete-google-cloud-deployment-of-prefect-2-0-32b8e3c2febe
+
 1. `prefect init` to create a new prefect project.
 
 2. `prefect deploy` to deploy flows.
+
+3. `docker build -t europe-west1-docker.pkg.dev/mlops-389311/email-discriminator/email-discriminator:1 .`
+
+4. `docker push europe-west1-docker.pkg.dev/mlops-389311/email-discriminator/email-discriminator:1`
