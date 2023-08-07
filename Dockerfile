@@ -9,7 +9,7 @@ ADD . /app
 # Install any needed packages specified in pyproject.toml
 RUN pip install poetry
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev --no-interaction --no-ansi
+RUN poetry install --only main --no-interaction --no-ansi
 
 # Add the poetry scripts to the PATH
 ENV PATH="${PATH}:/root/.local/bin"

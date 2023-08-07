@@ -61,6 +61,10 @@ https://medium.com/@danilo.drobac/7-a-complete-google-cloud-deployment-of-prefec
 
 2. `prefect deploy` to deploy flows.
 
-3. `docker build -t europe-west1-docker.pkg.dev/mlops-389311/email-discriminator/email-discriminator:1 .`
+3. `docker build --platform linux/amd64 -t europe-west1-docker.pkg.dev/mlops-389311/email-discriminator/email-discriminator:1 .`
 
 4. `docker push europe-west1-docker.pkg.dev/mlops-389311/email-discriminator/email-discriminator:1`
+
+5. `python flow-deployment.py`
+
+TODO: Automatically refresh GMAIL API token
