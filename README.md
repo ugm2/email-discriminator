@@ -1,5 +1,5 @@
 
-<img align="left" width="50" height="50" src="./images/email-discriminator.png" alt="email-discriminator" style="padding-right: 10px; padding-bottom: -100px">
+<img align="left" width="50" height="50" src="./images/email-discriminator.png" alt="email-discriminator">
 
 # email-discriminator
 
