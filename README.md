@@ -1,4 +1,6 @@
 
+<img align="left" width="40" height="40" src="./images/email-discriminator.png" alt="email-discriminator" style="padding-right: 10px">
+
 # email-discriminator
 
 This is a project for the MLOps Zoomcamp Course where I'll be creating an email discriminator
