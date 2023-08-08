@@ -77,7 +77,9 @@ def delete_emails(email_fetcher: EmailFetcher, email_ids: List[str]) -> None:
 
 
 @task
-def load_data(gcs_handler: GCSVersionedDataHandler, data_hash: str) -> DataFrame:
+def load_unlabelled_data(
+    gcs_handler: GCSVersionedDataHandler, data_hash: str
+) -> DataFrame:
     """
     Load data from a CSV file in Google Cloud Storage.
     """
@@ -166,7 +168,7 @@ def predict_flow(do_delete_emails: bool) -> None:
         delete_emails(email_fetcher, email_ids)
 
     # Load the unlabelled data.
-    df = load_data(gcs_handler, data_hash)
+    df = load_unlabelled_data(gcs_handler, data_hash)
 
     # Load the model pipeline.
     pipeline = load_pipeline(MODEL_NAME)

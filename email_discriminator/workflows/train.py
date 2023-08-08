@@ -25,7 +25,7 @@ mlflow.set_experiment(MODEL_NAME)
 
 
 @task
-def load_data(gcs_handler: GCSVersionedDataHandler) -> pd.DataFrame:
+def load_training_data(gcs_handler: GCSVersionedDataHandler) -> pd.DataFrame:
     """
     Loads the original data and all the training data from GCS.
 
@@ -86,9 +86,9 @@ def split_data(
 
 
 @task
-def load_pipeline() -> imblearnPipeline:
+def create_pipeline() -> imblearnPipeline:
     logger = get_run_logger()
-    logger.info("Loading pipeline")
+    logger.info("Creating pipeline")
     return imblearnPipeline(
         [
             ("features", DataProcessor()),
@@ -234,11 +234,11 @@ def train_flow() -> None:
     gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
 
     # Load and split the data
-    df = load_data(gcs_handler)
+    df = load_training_data(gcs_handler)
     X_train, X_test, y_train, y_test = split_data(df)
 
     # Create pipeline and grid search
-    pipeline = load_pipeline()
+    pipeline = create_pipeline()
     grid_search = create_grid_search(pipeline)
 
     # Train
