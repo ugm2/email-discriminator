@@ -40,6 +40,36 @@ Where and how these are stored in Gmail depends on the user, but in this case th
 
 ### Approach
 
+```mermaid
+graph TD
+
+    style A fill:#f9d5e5,stroke:#333,stroke-width:4px;
+    style B fill:#eeac99,stroke:#333,stroke-width:4px;
+    style C fill:#e06377,stroke:#333,stroke-width:4px;
+    style D fill:#c83349,stroke:#333,stroke-width:4px;
+    style E fill:#5b9aa0,stroke:#333,stroke-width:4px;
+    style F fill:#d6eafd,stroke:#333,stroke-width:4px;
+    style H fill:#f3c623,stroke:#333,stroke-width:4px;
+
+    A[Start]
+    B[Get and store initial labeled data]
+    C[Train & deploy initial ML model]
+    D{Weekly Batch Process}
+    H[Fetch emails & delete from source]
+    E[Review & Label via UI]
+    F[Re-train & deploy new model]
+    G[Loop to next batch]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> H
+    H --> E
+    E --> F
+    F --> G
+    G --> D
+```
+
 The approach to solving this problem involves several steps:
 
 1. **Data Collection**: Using the Gmail API to fetch the TLDRs from the different Gmail labels. I'm dumping the data into a CSV file in the `data` folder.
