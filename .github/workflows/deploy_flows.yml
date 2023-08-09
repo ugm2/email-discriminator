@@ -19,14 +19,13 @@ jobs:
 
     -   name: Install dependencies
         run: |
+            poetry config virtualenvs.create false
             poetry install --only main --no-interaction --no-ansi
 
     -   name: Login to Prefect Cloud 2.0
         env:
             PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: |
-            export PATH="$HOME/.local/bin:$PATH"
-            prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
+        run: prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
 
     -   name: Deploy flows
         run: python flow-deployment.py
