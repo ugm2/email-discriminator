@@ -1,14 +1,23 @@
 import argparse
+import logging
+import os
 
 from prefect.deployments import Deployment
 from prefect.filesystems import GCS
 from prefect_gcp.cloud_run import CloudRunJob
+from rich.logging import RichHandler
 
 from email_discriminator.workflows.predict import predict_flow
 from email_discriminator.workflows.train import train_flow
 
+# Get the logger level from environment variables. Default to WARNING if not set.
+LOGGER_LEVEL = os.getenv("LOGGER_LEVEL", "WARNING")
+logging.basicConfig(level=LOGGER_LEVEL, format="%(message)s", handlers=[RichHandler()])
+logger = logging.getLogger("Flow Deployment")
+
 
 def deploy(flow, name, version, gcs_block, cloud_run_block, work_queue_name="main"):
+    logging.info(f"Deploying {name} version {version} to Cloud Run...")
     deployment = Deployment.build_from_flow(
         flow=flow,
         name=name,
@@ -18,6 +27,7 @@ def deploy(flow, name, version, gcs_block, cloud_run_block, work_queue_name="mai
         infrastructure=cloud_run_block,
     )
     deployment.apply()
+    logging.info(f"Deployment of {name} version {version} completed successfully.")
 
 
 def main(args):
@@ -46,14 +56,14 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Deploy workflows to Cloud Run.")
     parser.add_argument(
-        "workflow",
+        "--workflow",
         choices=["predict", "train", "all"],
         default="all",
         nargs="?",
         help="The workflow to deploy. 'all' will deploy both workflows.",
     )
     parser.add_argument(
-        "version",
+        "--version",
         type=int,
         default=1,
         nargs="?",

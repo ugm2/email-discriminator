@@ -43,13 +43,13 @@ Where and how these are stored in Gmail depends on the user, but in this case th
 ```mermaid
 graph TD
 
-    style A fill:#f9d5e5,stroke:#333,stroke-width:4px, color:#000;
-    style B fill:#eeac99,stroke:#333,stroke-width:4px, color:#000;
-    style C fill:#e06377,stroke:#333,stroke-width:4px, color:#000;
-    style D fill:#c83349,stroke:#333,stroke-width:4px, color:#000;
-    style E fill:#5b9aa0,stroke:#333,stroke-width:4px, color:#000;
-    style F fill:#d6eafd,stroke:#333,stroke-width:4px, color:#000;
-    style H fill:#f3c623,stroke:#333,stroke-width:4px, color:#000;
+    style A fill:#f9d5e5,stroke:#333,stroke-width:4px;
+    style B fill:#eeac99,stroke:#333,stroke-width:4px;
+    style C fill:#e06377,stroke:#333,stroke-width:4px;
+    style D fill:#c83349,stroke:#333,stroke-width:4px;
+    style E fill:#5b9aa0,stroke:#333,stroke-width:4px;
+    style F fill:#d6eafd,stroke:#333,stroke-width:4px;
+    style H fill:#f3c623,stroke:#333,stroke-width:4px;
 
     A[Start]
     B[Get and store initial labeled data]

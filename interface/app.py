@@ -26,7 +26,7 @@ def get_relevant_df(df: pd.DataFrame, show_all: bool) -> pd.DataFrame:
     if show_all:
         return df
     else:
-        return df[df["predicted_is_relevant"]]
+        return df[df["predicted_is_relevant"].astype(bool)]
 
 
 def update_df(index: int, predicted_is_relevant: bool, row: pd.Series) -> bool:
@@ -107,6 +107,8 @@ def main():
         reviewed_df, unreviewed_df = dh.split_dataframe(
             st.session_state.df, end_pagination
         )
+        # Add column to reviewed_df 'is_relevant' equal to 'predicted_is_relevant'
+        reviewed_df["is_relevant"] = reviewed_df["predicted_is_relevant"]
         # Upload the data
         dh.upload_reviewed_data(reviewed_df, unreviewed_df, selected_csv)
         st.sidebar.success("Data uploaded to GCS 😊")

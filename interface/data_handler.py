@@ -31,14 +31,16 @@ def upload_reviewed_data(
     Uploads reviewed and unreviewed data to GCS, and deletes the old file.
     """
     # Convert the dataframes to CSV strings
-    reviewed_csv_string = reviewed_df.to_string()
-    unreviewed_csv_string = unreviewed_df.to_string()
+    reviewed_csv_string = reviewed_df.to_csv(index=False)
+    unreviewed_csv_string = unreviewed_df.to_csv(index=False)
 
     # Compute the data hash for each CSV string
-    reviewed_data_hash = hashlib.sha256(reviewed_csv_string.encode()).hexdigest()[:10]
-    unreviewed_data_hash = hashlib.sha256(unreviewed_csv_string.encode()).hexdigest()[
+    reviewed_data_hash = hashlib.sha256(reviewed_df.to_string().encode()).hexdigest()[
         :10
     ]
+    unreviewed_data_hash = hashlib.sha256(
+        unreviewed_df.to_string().encode()
+    ).hexdigest()[:10]
 
     # Upload the reviewed data to the training_data folder
     gcs_handler.upload_training_data(reviewed_csv_string, reviewed_data_hash)

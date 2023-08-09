@@ -18,7 +18,6 @@ MLFLOW_URI = os.getenv("MLFLOW_URI", "http://35.206.147.175:5000")
 DATA_PATH = os.getenv("DATA_PATH", "data/tldr_articles.csv")
 MODEL_NAME = os.getenv("MODEL_NAME", "email_discriminator")
 BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
-MODEL_STAGE = os.getenv("MODEL_STAGE", None)
 
 mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment(MODEL_NAME)
@@ -50,7 +49,11 @@ def load_training_data(gcs_handler: GCSVersionedDataHandler) -> pd.DataFrame:
     training_data_dfs = []
     for csv in training_data_files.values():
         df = pd.read_csv(io.StringIO(csv))
-        df.drop(columns=["predicted_is_relevant", "Unnamed: 0"], inplace=True)
+        df.drop(
+            columns=["predicted_is_relevant", "Unnamed: 0"],
+            inplace=True,
+            errors="ignore",
+        )
         logger.info(f"Loaded training data with shape {df.shape}")
         logger.debug(df.head())
         training_data_dfs.append(df)
@@ -222,7 +225,7 @@ def log_metrics_and_model(
 
 
 @flow(name="train-flow")
-def train_flow() -> None:
+def train_flow(model_stage: Optional[str]) -> None:
     """
     The main flow for training the model, includes loading data, splitting it, creating and fitting a pipeline,
     evaluating the pipeline, and logging metrics and model.
@@ -248,7 +251,7 @@ def train_flow() -> None:
     report = evaluation(grid_search, X_test, y_test)
 
     # Log metrics and model
-    log_metrics_and_model(report, grid_search, MODEL_NAME, MODEL_STAGE)
+    log_metrics_and_model(report, grid_search, MODEL_NAME, model_stage)
 
 
 if __name__ == "__main__":
