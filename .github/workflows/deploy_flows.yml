@@ -1,0 +1,30 @@
+name: Deploy flows
+on: [push, pull_request]
+
+jobs:
+  deploy_flows:
+
+    runs-on: ubuntu-latest
+    steps:
+    -   uses: actions/checkout@v2
+
+    -   name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.10'
+
+    -   name: Install Poetry
+        run: |
+            curl -sSL https://install.python-poetry.org | python3 -
+
+    -   name: Install dependencies
+        run: |
+            poetry install
+
+    -   name: Login to Prefect Cloud 2.0
+        env:
+            PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+        run: prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
+
+    -   name: Deploy flows
+        run: python flow-deployment.py
