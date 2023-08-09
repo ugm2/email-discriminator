@@ -25,7 +25,7 @@ jobs:
     -   name: Login to Prefect Cloud 2.0
         env:
             PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: prefect cloud login --key $PREFECT_API_KEY
+        run: prefect cloud login --key $PREFECT_API_KEY --workspace unaigaraymaestre2gmailcom/mlops-zoomcamp
 
     -   name: Authenticate with GCP
         uses: google-github-actions/auth@v1
