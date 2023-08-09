@@ -19,12 +19,12 @@ jobs:
 
     -   name: Install dependencies
         run: |
-            poetry install
+            poetry install --only main --no-interaction --no-ansi
 
     -   name: Login to Prefect Cloud 2.0
         env:
             PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: poetry -m prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
+        run: python -m prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
 
     -   name: Deploy flows
-        run: poetry -m python flow-deployment.py
+        run: python flow-deployment.py

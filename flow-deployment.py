@@ -16,7 +16,15 @@ logging.basicConfig(level=LOGGER_LEVEL, format="%(message)s", handlers=[RichHand
 logger = logging.getLogger("Flow Deployment")
 
 
-def deploy(flow, name, version, gcs_block, cloud_run_block, work_queue_name="main"):
+def deploy(
+    flow,
+    name,
+    version,
+    gcs_block,
+    cloud_run_block,
+    work_queue_name="main",
+    work_pool_name="google-pool",
+):
     logging.info(f"Deploying {name} version {version} to Cloud Run...")
     deployment = Deployment.build_from_flow(
         flow=flow,
@@ -24,6 +32,7 @@ def deploy(flow, name, version, gcs_block, cloud_run_block, work_queue_name="mai
         version=version,
         storage=gcs_block,
         work_queue_name=work_queue_name,
+        work_pool_name=work_pool_name,
         infrastructure=cloud_run_block,
     )
     deployment.apply()
