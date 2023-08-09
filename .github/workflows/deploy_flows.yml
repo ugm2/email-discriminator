@@ -24,7 +24,7 @@ jobs:
     -   name: Login to Prefect Cloud 2.0
         env:
             PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
+        run: poetry -m prefect cloud login --key $PREFECT_API_KEY --workspace mlops-zoomcamp
 
     -   name: Deploy flows
-        run: python flow-deployment.py
+        run: poetry -m python flow-deployment.py
