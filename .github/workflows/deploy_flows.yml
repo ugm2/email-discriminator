@@ -22,10 +22,10 @@ jobs:
             poetry config virtualenvs.create false
             poetry install --only main --no-interaction --no-ansi
 
-    -   name: Login to Prefect Cloud 2.0
-        env:
-            PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: prefect cloud login --key $PREFECT_API_KEY --workspace unaigaraymaestre2gmailcom/mlops-zoomcamp
+    -   name: Prefect Cloud login
+        run: |
+            prefect config set PREFECT_API_KEY=${{ secrets.PREFECT_API_KEY }}
+            prefect config set PREFECT_API_URL=${{ secrets.PREFECT_API_URL }}
 
     -   name: Authenticate with GCP
         uses: google-github-actions/auth@v1
