@@ -4,7 +4,10 @@ version = "0.0.1"
 description = "This is a project for the MLOps Zoomcamp Course where I'll be creating an email discriminator"
 authors = ["ugm2 <unaigaraymaestre@gmail.com>"]
 readme = "README.md"
-packages = [{include = "email_discriminator"}]
+packages = [
+    {include = "email_discriminator"},
+    {include = "interface"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.9.7 || >3.9.7,<3.12"

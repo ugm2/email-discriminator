@@ -50,15 +50,29 @@ graph TD
     style E fill:#5b9aa0,stroke:#333,stroke-width:4px;
     style F fill:#d6eafd,stroke:#333,stroke-width:4px;
     style H fill:#f3c623,stroke:#333,stroke-width:4px;
+    style I fill:#93c6ed,stroke:#333,stroke-width:4px;
+    style J fill:#c6c3ed,stroke:#333,stroke-width:4px;
+    style K fill:#b2c9ab,stroke:#333,stroke-width:4px;
+    style L fill:#f6e3b4,stroke:#333,stroke-width:4px;
+    style M fill:#a9f1e1,stroke:#333,stroke-width:4px;
+    style N fill:#f6d8e0,stroke:#333,stroke-width:4px;
+    style O fill:#e9b0df,stroke:#333,stroke-width:4px;
 
     A[Start]
     B[Get and store initial labeled data]
     C[Train & deploy initial ML model]
     D{Weekly Batch Process}
-    H[Fetch emails & delete from source]
+    H[Fetch emails, delete from source & predict]
     E[Review & Label via UI]
     F[Re-train & deploy new model]
     G[Loop to next batch]
+    I[Prefect Cloud]
+    J[MLFlow GCP Server]
+    K[Main Queue GCP Server]
+    L[Streamlit Interface]
+    M[GCP Cloud Run]
+    N[Fetch & Predict Flow]
+    O[Train & Deploy Flow]
 
     A --> B
     B --> C
@@ -68,6 +82,25 @@ graph TD
     E --> F
     F --> G
     G --> D
+
+    N -.- H
+    O -.- F
+    N -.-> I
+    O -.-> I
+    I -.-> K
+    O -.-> J
+    E -.-> L
+
+    classDef GCP style fill:#e1eef6,stroke:#333,stroke-width:3px;
+    classDef streamlit style fill:#d9f2d9,stroke:#333,stroke-width:3px;
+    classDef prefect style fill:#f5d5e5,stroke:#333,stroke-width:3px;
+    classDef flows style fill:#ffe6e6,stroke:#333,stroke-width:3px;
+
+    class I prefect;
+    class J,K,M GCP;
+    class L streamlit;
+    class N,O flows;
+
 ```
 
 The approach to solving this problem involves several steps:

@@ -1,15 +1,28 @@
 import io
+import time
 
-import data_handler as dh
 import pandas as pd
 import streamlit as st
 
-# -- Set page config
+import interface.data_handler as dh
+from interface.prefect_client import call_flow
+
+# Set page config
 apptitle = "TLDR"
 st.set_page_config(page_title=apptitle, page_icon="📧")
 
 # Title the app
-st.title("📧 TLDR email discriminator")
+st.sidebar.title("📧 TLDR email discriminator")
+
+
+@st.cache_data
+def download_data():
+    return dh.download_data()
+
+
+def refresh_data():
+    st.cache_data.clear()
+    del st.session_state.df
 
 
 def load_data(selected_csv: str) -> pd.DataFrame:
@@ -43,8 +56,12 @@ def update_df(index: int, predicted_is_relevant: bool, row: pd.Series) -> bool:
 
 
 def main():
+    # Refresh cache
+    if st.sidebar.button("Fetch new data & clear cache"):
+        refresh_data()
+
     # Fetch CSV files from GCS
-    predict_csv_files = dh.download_data()
+    predict_csv_files = download_data()
 
     # Create a dropdown in the sidebar to select a CSV file
     selected_csv = st.sidebar.selectbox("Select a CSV file", predict_csv_files.keys())
@@ -111,7 +128,30 @@ def main():
         reviewed_df["is_relevant"] = reviewed_df["predicted_is_relevant"]
         # Upload the data
         dh.upload_reviewed_data(reviewed_df, unreviewed_df, selected_csv)
-        st.sidebar.success("Data uploaded to GCS 😊")
+        # Refresh data
+        refresh_data()
+        # Refresh page
+        st.sidebar.success("Data uploaded to GCS 📚😊")
+        time.sleep(2)
+        st.experimental_rerun()
+
+    st.sidebar.write("---")
+    st.sidebar.write("### Training")
+    with st.sidebar.expander("Training Config", False):
+        deployment_name = st.sidebar.text_input(
+            "Flow deployment name", "train-flow/email_discriminator-train"
+        )
+        model_stage = st.sidebar.selectbox(
+            "Model stage", ["Staging", "Production"], index=0
+        )
+    if st.sidebar.button("Train"):
+        # Call the training flow
+        flow_run = call_flow(
+            deployment_name=deployment_name, parameters={"model_stage": model_stage}
+        )
+        st.sidebar.success(
+            f"Training flow started with Flow Run ID {flow_run.id} and Flow Run name {flow_run.name} 🚗💨"
+        )
 
 
 if __name__ == "__main__":
