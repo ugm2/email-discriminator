@@ -2,12 +2,17 @@ import hashlib
 import os
 
 import pandas as pd
+import streamlit as st
+from google.oauth2 import service_account
 
 from email_discriminator.core.data_versioning import GCSVersionedDataHandler
 
 # Initialize GCS handler
 BUCKET_NAME = os.getenv("BUCKET_NAME", "email-discriminator")
-gcs_handler = GCSVersionedDataHandler(BUCKET_NAME)
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"]
+)
+gcs_handler = GCSVersionedDataHandler(BUCKET_NAME, credentials=credentials)
 
 
 def download_data() -> pd.DataFrame:

@@ -169,3 +169,5 @@ token.pickle
 # MLFlow
 mlruns/
 mlartifacts/
+
+.streamlit/secrets.toml

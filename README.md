@@ -82,8 +82,13 @@ The approach to solving this problem involves several steps:
 
 5. **Model Deployment**: Deploying the model to a production environment where it can make predictions on new, unseen TLDRs.
 
-
 ### Deployment procedure
+
+MLFLOW:
+
+https://www.youtube.com/watch?v=MWfKAgEHsHo
+
+PREFECT:
 
 https://medium.com/@danilo.drobac/7-a-complete-google-cloud-deployment-of-prefect-2-0-32b8e3c2febe
 
@@ -98,3 +103,29 @@ https://medium.com/@danilo.drobac/7-a-complete-google-cloud-deployment-of-prefec
 5. `python flow-deployment.py`
 
 TODO: Automatically refresh GMAIL API token
+
+INTERFACE:
+
+1. Create VM instance in GCP.
+
+2. Execute this in the machine:
+
+```shell
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    python3-dateutil \
+    python3-distutils \
+    git-all
+sudo ln -s /usr/bin/python3 /usr/bin/python
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python3 get-pip.py
+PATH="$HOME/.local/bin:$PATH"
+export PATH
+rm get-pip.py
+```

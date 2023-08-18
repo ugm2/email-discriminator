@@ -12,9 +12,9 @@ logger = logging.getLogger("GCSVersionedDataHandler")
 
 
 class GCSVersionedDataHandler:
-    def __init__(self, bucket_name):
+    def __init__(self, bucket_name, credentials=None):
         self.bucket_name = bucket_name
-        self.storage_client = storage.Client()
+        self.storage_client = storage.Client(credentials=credentials)
 
     def enable_versioning(self):
         logger.info("Enabling versioning...")
