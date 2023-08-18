@@ -57,7 +57,7 @@ def main(args):
             gcs_block,
             cloud_run_block,
             schedule=user_schedule,
-            flow_parameters={"predict_delete_emails": args.predict_delete_emails},
+            flow_parameters={"do_delete_emails": args.predict_delete_emails},
         )
 
     if args.workflow == "all" or args.workflow == "train":
