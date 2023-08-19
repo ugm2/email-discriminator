@@ -1,12 +1,15 @@
 name: Build and Push Docker Image to Artifact Registry
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Python CI"]
+    types:
+      - completed
 
 jobs:
   build:
+    # Conditionally run this job only on success of the Python CI workflow on the main branch
+    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
