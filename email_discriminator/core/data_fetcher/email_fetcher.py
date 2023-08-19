@@ -42,15 +42,14 @@ class EmailFetcher:
 
         self.creds_path = creds_path
         self.client_secret_path = client_secret_path
-        self.gcs_data_handler = GCSVersionedDataHandler(GCS_BUCKET_NAME)
         self.service = self.get_service()
 
     def get_service(self) -> Resource:
         """
         Authenticates and returns a service object for the Gmail API.
         """
-
-        creds = self.gcs_data_handler.read_token_from_gcs(
+        gcs_data_handler = GCSVersionedDataHandler(GCS_BUCKET_NAME)
+        creds = gcs_data_handler.read_token_from_gcs(
             GCS_BUCKET_NAME, "secrets/token.pickle"
         )
 
@@ -68,7 +67,7 @@ class EmailFetcher:
                     ["https://www.googleapis.com/auth/gmail.modify"],
                 )
                 creds = flow.run_local_server(port=0)
-                self.gcs_data_handler.write_token_to_gcs(
+                gcs_data_handler.write_token_to_gcs(
                     creds, GCS_BUCKET_NAME, "secrets/token.pickle"
                 )
 
