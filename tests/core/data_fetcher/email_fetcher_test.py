@@ -204,20 +204,28 @@ def test_get_articles_from_emails(mock_get_service, mock_get_body, mock_get_emai
 
 
 @patch.object(EmailFetcher, "get_service", return_value=MagicMock())
-def test_delete_emails(mock_get_service):
+def test_trash_emails(mock_get_service):
     mock_service = mock_get_service.return_value
-    mock_batch_delete_method = (
-        mock_service.users.return_value.messages.return_value.batchDelete
-    )
-    mock_batch_delete_method.return_value.execute.return_value = "Result"
+    mock_trash_method = mock_service.users.return_value.messages.return_value.trash
+    mock_trash_method.return_value.execute.side_effect = [
+        "Result1",
+        "Result2",
+        "Result3",
+    ]
 
     fetcher = EmailFetcher()
 
     email_ids = ["id1", "id2", "id3"]
-    result = fetcher.delete_emails(email_ids)
+    results = fetcher.trash_emails(email_ids)
 
-    assert result == "Result"
+    assert results == ["Result1", "Result2", "Result3"]
 
-    mock_batch_delete_method.assert_called_once_with(
-        userId="me", body={"ids": email_ids}
+    # Ensure the trash method is called for each email id.
+    mock_trash_method.assert_has_calls(
+        [
+            call(userId="me", id="id1"),
+            call(userId="me", id="id2"),
+            call(userId="me", id="id3"),
+        ],
+        any_order=True,
     )

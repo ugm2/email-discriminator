@@ -72,7 +72,7 @@ def delete_emails(email_fetcher: EmailFetcher, email_ids: List[str]) -> None:
     """
     logger = get_run_logger()
     logger.info("Deleting emails")
-    email_fetcher.delete_emails(email_ids)
+    email_fetcher.trash_emails(email_ids)
     logger.info("Deleted emails")
 
 
