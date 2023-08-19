@@ -1,5 +1,6 @@
 name: Deploy flows
 
+# Runs only when Tests & Lint pass successfully
 on:
   workflow_run:
     workflows: ["Python CI"]

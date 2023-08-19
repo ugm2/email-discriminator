@@ -5,21 +5,86 @@ import pytest
 from email_discriminator.core.data_fetcher import EmailFetcher
 
 
-@patch("builtins.open", new_callable=mock_open, read_data="token.pickle")
+@patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
 @patch("email_discriminator.core.data_fetcher.email_fetcher.build")
 @patch(
     "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
 )
-@patch("email_discriminator.core.data_fetcher.email_fetcher.pickle.load")
-@patch("email_discriminator.core.data_fetcher.email_fetcher.os.path.exists")
-def test_get_service(mock_exists, mock_load, mock_flow, mock_build, mock_open):
-    mock_exists.return_value = True
-    mock_load.return_value = MagicMock(valid=True)
-    mock_build.return_value = "Service"
-    mock_open.return_value.__enter__.return_value = mock_open.return_value
+def test_get_service_with_valid_token(mock_flow, mock_build, mock_data_handler_class):
+    # Set up the mock objects
+    mock_data_handler = mock_data_handler_class.return_value
 
+    mock_creds = MagicMock(valid=True)
+    mock_data_handler.read_token_from_gcs.return_value = mock_creds
+    mock_build.return_value = "Service"
+
+    # Instantiate the EmailFetcher after setting up the mocks
     fetcher = EmailFetcher()
+
+    # Continue with your assertions
     assert fetcher.service == "Service"
+    mock_data_handler.read_token_from_gcs.assert_called_once_with(
+        "email-discriminator", "secrets/token.pickle"
+    )
+    mock_data_handler.write_token_to_gcs.assert_not_called()
+
+
+@patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
+@patch("email_discriminator.core.data_fetcher.email_fetcher.build")
+@patch(
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
+)
+def test_get_service_with_refreshable_expired_token(
+    mock_flow, mock_build, mock_data_handler_class
+):
+    # Set up the mock objects
+    mock_data_handler = mock_data_handler_class.return_value
+
+    mock_creds = MagicMock(valid=False, expired=True, refresh_token=True)
+    mock_data_handler.read_token_from_gcs.return_value = mock_creds
+    mock_build.return_value = "Service"
+
+    # Instantiate the EmailFetcher after setting up the mocks
+    fetcher = EmailFetcher()
+
+    # Assertions
+    assert fetcher.service == "Service"
+    mock_data_handler.read_token_from_gcs.assert_called_once_with(
+        "email-discriminator", "secrets/token.pickle"
+    )
+    mock_data_handler.write_token_to_gcs.assert_not_called()  # token refreshed without reauth, so not written back
+
+
+@patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
+@patch("email_discriminator.core.data_fetcher.email_fetcher.build")
+@patch(
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
+)
+def test_get_service_with_non_refreshable_expired_token(
+    mock_flow, mock_build, mock_data_handler_class
+):
+    # Set up the mock objects
+    mock_data_handler = mock_data_handler_class.return_value
+
+    mock_creds = MagicMock(valid=False, expired=True, refresh_token=True)
+    mock_data_handler.read_token_from_gcs.return_value = mock_creds
+    mock_build.return_value = "Service"
+    mock_flow.return_value.run_local_server.return_value = "NewCreds"
+
+    # Make the refresh throw an exception
+    mock_creds.refresh.side_effect = Exception("Failed to refresh")
+
+    # Instantiate the EmailFetcher after setting up the mocks
+    fetcher = EmailFetcher()
+
+    # Assertions
+    assert fetcher.service == "Service"
+    mock_data_handler.read_token_from_gcs.assert_called_once_with(
+        "email-discriminator", "secrets/token.pickle"
+    )
+    mock_data_handler.write_token_to_gcs.assert_called_once_with(
+        "NewCreds", "email-discriminator", "secrets/token.pickle"
+    )
 
 
 @patch.object(EmailFetcher, "get_service", return_value=MagicMock())

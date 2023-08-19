@@ -1,5 +1,6 @@
 import logging
 import os
+import pickle
 from typing import Optional
 
 from google.cloud import storage
@@ -166,3 +167,17 @@ class GCSVersionedDataHandler:
         blob = bucket.blob(f"data/predicted_data/new/tldr_articles_{data_hash}.csv")
         blob.delete()
         logger.info(f"File {data_hash} deleted.")
+
+    def read_token_from_gcs(self, bucket_name: str, blob_name: str):
+        """Reads token from a GCS bucket."""
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        return pickle.loads(blob.download_as_bytes())
+
+    def write_token_to_gcs(self, creds, bucket_name: str, blob_name: str):
+        """Writes token to a GCS bucket."""
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        blob.upload_from_string(pickle.dumps(creds))
