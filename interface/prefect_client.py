@@ -17,8 +17,8 @@ def call_flow(
     """
 
     # Run the deployed flow
-    flow_run_id = prefect.deployments.run_deployment(
+    flow_run = prefect.deployments.run_deployment(
         name=deployment_name, parameters=parameters, timeout=0
-    ).id
+    )
 
-    return flow_run_id
+    return flow_run

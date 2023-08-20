@@ -150,7 +150,7 @@ def main():
             deployment_name=deployment_name, parameters={"model_stage": model_stage}
         )
         st.sidebar.success(
-            f"Training flow started with Flow Run ID {flow_run.id} and Flow Run name {flow_run.name} 🚗💨"
+            f"Training flow started with Flow Run ID **{flow_run.id}** and Flow Run name **{flow_run.name}** 🚗💨"
         )
 
 
