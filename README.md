@@ -43,7 +43,7 @@ Where and how these are stored in Gmail depends on the user, but in this case th
 It's a much more complex problem than I thought it would be, because it involves talking to the Gmail API and a lot of different process to handle the fetching, syncinc and removing of the data (emails).
 
 ```mermaid
-subgraph TD
+graph TD
 
     style A fill:#f9d5e5,stroke:#333,stroke-width:4px;
     style B fill:#eeac99,stroke:#333,stroke-width:4px;
