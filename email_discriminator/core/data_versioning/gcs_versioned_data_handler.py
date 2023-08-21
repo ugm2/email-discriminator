@@ -170,14 +170,12 @@ class GCSVersionedDataHandler:
 
     def read_token_from_gcs(self, bucket_name: str, blob_name: str):
         """Reads token from a GCS bucket."""
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucket_name)
+        bucket = self.storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
         return pickle.loads(blob.download_as_bytes())
 
     def write_token_to_gcs(self, creds, bucket_name: str, blob_name: str):
         """Writes token to a GCS bucket."""
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucket_name)
+        bucket = self.storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
         blob.upload_from_string(pickle.dumps(creds))

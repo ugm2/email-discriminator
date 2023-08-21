@@ -68,7 +68,7 @@ graph TD
     G[Loop to next batch]
     I[Prefect Cloud]
     J[MLFlow GCP Server]
-    K[Main Queue GCP Server]
+    K[Main Prefect Flow Queue GCP Server]
     L[Streamlit Interface]
     M[GCP Cloud Run]
     N[Fetch & Predict Flow]

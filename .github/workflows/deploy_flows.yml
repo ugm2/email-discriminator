@@ -42,4 +42,4 @@ jobs:
     -   name: Deploy flows
         env:
             PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-        run: python flow-deployment.py --predict-delete_emails
+        run: python flow-deployment.py --predict-delete_emails --cron "0 9 * * 4"
