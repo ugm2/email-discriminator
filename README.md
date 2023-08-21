@@ -1,7 +1,7 @@
 
-<img align="left" width="50" height="50" src="./images/email-discriminator.png" alt="email-discriminator">
+<img width="580" height="200" src="./images/email-discriminator-title.PNG" alt="TLDR email-discriminator">
 
-# email-discriminator
+[![codecov](https://codecov.io/gh/ugm2/email-discriminator/graph/badge.svg?token=6FCPGWHIZ4)](https://codecov.io/gh/ugm2/email-discriminator)
 
 This is a project for the MLOps Zoomcamp Course where I'll be creating an email discriminator
 

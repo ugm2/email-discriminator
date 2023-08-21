@@ -9,10 +9,20 @@ from interface.prefect_client import call_flow
 
 # Set page config
 apptitle = "TLDR"
-st.set_page_config(page_title=apptitle, page_icon="📧")
+icon_image = "images/email-discriminator.png"
+st.set_page_config(page_title=apptitle, page_icon=icon_image)
 
 # Title the app
-st.sidebar.title("📧 TLDR email discriminator")
+# Using columns to display the image alongside the title
+col1, col2 = st.sidebar.columns([1, 1.5])
+
+# Image in the first column
+col1.image(icon_image, width=100)
+
+# Title in the second column
+col2.title("TLDR email discriminator")
+
+st.sidebar.markdown("---")
 
 
 @st.cache_data
