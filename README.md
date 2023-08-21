@@ -25,6 +25,8 @@ The problem is a binary classification task with two classes:
 
 The model will take as input the text of a TLDR article and output a prediction of whether it is relevant (Class 1) or not (Class 0).
 
+Each email contains several TLDR articles that we have to break down and classify.
+
 ### Data
 
 The data for this project comes from the user's Gmail account. **The user has MANUALLY categorised the TLDRs into different labels**:
@@ -40,7 +42,7 @@ Where and how these are stored in Gmail depends on the user, but in this case th
 
 ## Approach
 
-It's a much more complex problem than I thought it would be, because it involves talking to the Gmail API and a lot of different process to handle the fetching, syncinc and removing of the data (emails).
+It's a much more complex problem than I thought it would be, because it involves talking to the Gmail API and a lot of different processes to handle the fetching, syncing and removing of the data (emails).
 
 ```mermaid
 graph TD
