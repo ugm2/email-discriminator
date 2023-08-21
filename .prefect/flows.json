@@ -1,3 +1,0 @@
-{
-  "predict-flow": ".tox/lint/lib/python3.10/site-packages/email_discriminator/workflows/predict.py:predict_flow"
-}
