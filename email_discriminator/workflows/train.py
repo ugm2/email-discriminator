@@ -8,6 +8,7 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.pipeline import Pipeline as imblearnPipeline
 from prefect import flow, get_run_logger, task
 from prefect.artifacts import create_table_artifact
+from prefect_alert import alert_on_failure
 from sklearn.metrics import classification_report, make_scorer, recall_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 
@@ -224,6 +225,7 @@ def log_metrics_and_model(
     )
 
 
+@alert_on_failure(to=["unaigaraymaestre@gmail.com"])
 @flow(name="train-flow")
 def train_flow(model_stage: Optional[str]) -> None:
     """

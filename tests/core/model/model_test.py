@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
@@ -108,3 +110,59 @@ def test_classes_():
     assert np.array_equal(
         model.classes_, np.array([0, 1])
     ), "'classes_' should be correctly set after fitting."
+
+
+def test_fit_exception():
+    model = Model()
+    X = np.random.normal(size=(100, 10))
+    y = np.random.choice([0, 1], size=100)
+
+    with patch.object(
+        model.model, "fit", side_effect=Exception("Error fitting the model")
+    ):
+        with pytest.raises(Exception) as e:
+            model.fit(X, y)
+        assert "Error fitting the model" in str(e.value)
+
+
+def test_predict_exception():
+    model = Model()
+    X = np.random.normal(size=(100, 10))
+    y = np.random.choice([0, 1], size=100)
+
+    model.fit(X, y)  # Fit the model first
+
+    with patch.object(
+        model.model, "predict_proba", side_effect=Exception("Error predicting")
+    ):
+        with pytest.raises(Exception) as e:
+            model.predict(X)
+        assert "Error predicting" in str(e.value)
+
+
+def test_predict_proba_exception():
+    model = Model()
+    X = np.random.normal(size=(100, 10))
+    y = np.random.choice([0, 1], size=100)
+
+    model.fit(X, y)  # Fit the model first
+
+    with patch.object(
+        model.model,
+        "predict_proba",
+        side_effect=Exception("Error predicting probabilities"),
+    ):
+        with pytest.raises(Exception) as e:
+            model.predict_proba(X)
+        assert "Error predicting probabilities" in str(e.value)
+
+
+def test_fit_single_threshold():
+    model = Model(thresholds=np.array([0.5]))  # Setting a single threshold
+    X = np.random.normal(size=(100, 10))
+    y = np.random.choice([0, 1], size=100)
+
+    model.fit(X, y)  # This should not enter the if len(self.thresholds) > 1: block
+
+    assert model.fitted == True, "Model should be fitted."
+    assert model.threshold == 0.5, "Threshold should remain 0.5 as it is not updated."

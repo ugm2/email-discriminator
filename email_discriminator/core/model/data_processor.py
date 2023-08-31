@@ -27,6 +27,12 @@ class TextSelector(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: DataFrame) -> DataFrame:
+        if self.key not in X.columns:
+            raise ValueError(
+                "Column `{}` not found! Available columns: {}".format(
+                    self.key, ", ".join(X.columns)
+                )
+            )
         return X[self.key]
 
 
@@ -53,11 +59,15 @@ class DataProcessor(BaseEstimator, TransformerMixin):
         )
 
     def fit(self, X: DataFrame, y: ndarray = None):
+        if X.empty:
+            raise ValueError("Input DataFrame is empty!")
+
         try:
             self.features.fit(X, y)
         except Exception as e:
             logging.error(f"Error fitting data: {e}")
             raise e
+
         return self
 
     def transform(self, X: DataFrame) -> ndarray:
