@@ -8,9 +8,18 @@ on:
       - completed
 
 jobs:
-  deploy_flows:
+  check_pull_request:
+    runs-on: ubuntu-latest
+    outputs:
+      is_pull_request: ${{ steps.set_var.outputs.is_pull_request }}
+    steps:
+    - name: Check if it's a Pull Request
+      id: set_var
+      run: echo "::set-output name=is_pull_request::${{ toJson(github.event.workflow_run.pull_requests) != '[]' }}"
 
-    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+  deploy_flows:
+    needs: check_pull_request
+    if: needs.check_pull_request.outputs.is_pull_request == 'false' && github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
     -   uses: actions/checkout@v2

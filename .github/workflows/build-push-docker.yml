@@ -7,9 +7,19 @@ on:
       - completed
 
 jobs:
+  check_pull_request:
+    runs-on: ubuntu-latest
+    outputs:
+      is_pull_request: ${{ steps.set_var.outputs.is_pull_request }}
+    steps:
+    - name: Check if it's a Pull Request
+      id: set_var
+      run: echo "::set-output name=is_pull_request::${{ toJson(github.event.workflow_run.pull_requests) != '[]' }}"
+
   build:
     # Conditionally run this job only on success of the Python CI workflow on the main branch
-    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+    needs: check_pull_request
+    if: needs.check_pull_request.outputs.is_pull_request == 'false' && github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
