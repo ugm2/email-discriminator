@@ -144,7 +144,6 @@ def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -
     return data_hash
 
 
-@alert_on_failure(to=["unaigaraymaestre@gmail.com"])
 @flow(name="predict-flow")
 def predict_flow(do_delete_emails: bool) -> None:
     """

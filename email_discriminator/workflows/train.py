@@ -225,7 +225,6 @@ def log_metrics_and_model(
     )
 
 
-@alert_on_failure(to=["unaigaraymaestre@gmail.com"])
 @flow(name="train-flow")
 def train_flow(model_stage: Optional[str]) -> None:
     """
