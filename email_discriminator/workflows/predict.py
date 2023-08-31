@@ -1,7 +1,6 @@
 import hashlib
 import io
 import os
-from datetime import datetime
 from typing import List, Tuple
 
 import mlflow
@@ -9,6 +8,7 @@ import pandas as pd
 from mlflow.pyfunc import PythonModel
 from pandas import DataFrame
 from prefect import flow, get_run_logger, task
+from prefect_alert import alert_on_failure
 
 from email_discriminator.core.data_fetcher import (
     EmailDatasetBuilder,
@@ -144,6 +144,7 @@ def upload_predicted_data(df: DataFrame, gcs_handler: GCSVersionedDataHandler) -
     return data_hash
 
 
+@alert_on_failure(to=["unaigaraymaestre@gmail.com"])
 @flow(name="predict-flow")
 def predict_flow(do_delete_emails: bool) -> None:
     """
