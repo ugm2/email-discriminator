@@ -30,7 +30,7 @@ class EmailFetcher:
     def __init__(
         self,
         creds_path: str = "secrets/token.pickle",
-        client_secret_path: str = "client_secret.json",
+        client_secret_path: str = "secrets/client_secret.json",
     ):
         """
         Constructs all the necessary attributes for the EmailFetcher object.
@@ -49,9 +49,7 @@ class EmailFetcher:
         Authenticates and returns a service object for the Gmail API.
         """
         gcs_data_handler = GCSVersionedDataHandler(GCS_BUCKET_NAME)
-        creds = gcs_data_handler.read_token_from_gcs(
-            GCS_BUCKET_NAME, "secrets/token.pickle"
-        )
+        creds = gcs_data_handler.read_token_from_gcs(GCS_BUCKET_NAME, self.creds_path)
 
         if not creds or not creds.valid:
             try:
@@ -62,13 +60,16 @@ class EmailFetcher:
                 creds = None
 
             if not creds:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.client_secret_path,
+                client_secret_json = gcs_data_handler.read_client_secrets_from_gcs(
+                    GCS_BUCKET_NAME, self.client_secret_path
+                )
+                flow = InstalledAppFlow.from_client_config(
+                    client_secret_json,
                     ["https://www.googleapis.com/auth/gmail.modify"],
                 )
                 creds = flow.run_local_server(port=0)
                 gcs_data_handler.write_token_to_gcs(
-                    creds, GCS_BUCKET_NAME, "secrets/token.pickle"
+                    creds, GCS_BUCKET_NAME, self.creds_path
                 )
 
         return build("gmail", "v1", credentials=creds)

@@ -8,7 +8,7 @@ from email_discriminator.core.data_fetcher import EmailFetcher
 @patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
 @patch("email_discriminator.core.data_fetcher.email_fetcher.build")
 @patch(
-    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_config"
 )
 def test_get_service_with_valid_token(mock_flow, mock_build, mock_data_handler_class):
     # Set up the mock objects
@@ -32,7 +32,33 @@ def test_get_service_with_valid_token(mock_flow, mock_build, mock_data_handler_c
 @patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
 @patch("email_discriminator.core.data_fetcher.email_fetcher.build")
 @patch(
-    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_config"
+)
+def test_get_service_with_different_default_token(
+    mock_flow, mock_build, mock_data_handler_class
+):
+    # Set up the mock objects
+    mock_data_handler = mock_data_handler_class.return_value
+
+    mock_creds = MagicMock(valid=True)
+    mock_data_handler.read_token_from_gcs.return_value = mock_creds
+    mock_build.return_value = "Service"
+
+    # Instantiate the EmailFetcher after setting up the mocks
+    fetcher = EmailFetcher(creds_path="secrets/different_token.pickle")
+
+    # Continue with your assertions
+    assert fetcher.service == "Service"
+    mock_data_handler.read_token_from_gcs.assert_called_once_with(
+        "email-discriminator", "secrets/different_token.pickle"
+    )
+    mock_data_handler.write_token_to_gcs.assert_not_called()
+
+
+@patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
+@patch("email_discriminator.core.data_fetcher.email_fetcher.build")
+@patch(
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_config"
 )
 def test_get_service_with_refreshable_expired_token(
     mock_flow, mock_build, mock_data_handler_class
@@ -58,7 +84,7 @@ def test_get_service_with_refreshable_expired_token(
 @patch("email_discriminator.core.data_fetcher.email_fetcher.GCSVersionedDataHandler")
 @patch("email_discriminator.core.data_fetcher.email_fetcher.build")
 @patch(
-    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_secrets_file"
+    "email_discriminator.core.data_fetcher.email_fetcher.InstalledAppFlow.from_client_config"
 )
 def test_get_service_with_non_refreshable_expired_token(
     mock_flow, mock_build, mock_data_handler_class

@@ -1,3 +1,4 @@
+import json
 import pickle
 from unittest.mock import MagicMock, Mock, patch
 
@@ -169,3 +170,10 @@ def test_write_token_to_gcs(handler):
     test_creds = "credentials"
     handler.write_token_to_gcs(test_creds, "test-bucket", "blob-name")
     mock_blob.upload_from_string.assert_called_with(pickle.dumps(test_creds))
+
+
+def test_read_client_secret_from_gcs(handler):
+    client_secrets_json = {"test": "test"}
+    mock_blob.download_as_text.return_value = json.dumps(client_secrets_json)
+    result = handler.read_client_secrets_from_gcs("test-bucket", "blob-name")
+    assert result == client_secrets_json

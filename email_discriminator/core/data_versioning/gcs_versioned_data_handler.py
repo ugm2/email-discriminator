@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import pickle
@@ -179,3 +180,9 @@ class GCSVersionedDataHandler:
         bucket = self.storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
         blob.upload_from_string(pickle.dumps(creds))
+
+    def read_client_secrets_from_gcs(self, bucket_name: str, blob_name: str):
+        """Reads client secrets from a GCS bucket."""
+        bucket = self.storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        return json.loads(blob.download_as_text())
