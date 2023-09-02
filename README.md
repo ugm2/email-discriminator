@@ -145,7 +145,7 @@ The approach to solving this problem involves several steps:
     ![GCP Bucket](images/gcp-bucket.png)
   * Cloud Run. Here's a screenshot of some Cloud Run jobs
     ![Cloud Run](images/cloud-run.png)
-* **MLFlow**: A tool for model experimentation and deployment. This was deployed as a service in a GCP Virtual Machine and is accessible through the link: [MLFlow Server](http://35.206.147.175:5000/)
+* **MLFlow**: A tool for model experimentation and deployment. This was deployed as a service in a GCP Virtual Machine
 ![MLFlow Server](images/mlflow-server.png)
 * **Prefect Cloud**: A tool for scheduling Prefect flows. I have 2 flows deployed in this cloud (fetch/predict & train/deploy):
 ![Prefect Cloud](images/prefect-cloud.png)
@@ -153,7 +153,7 @@ The approach to solving this problem involves several steps:
   ![Prefect Fetch/Predict Flow](images/prefect-predict-flow.png)
   * Train/Deploy: It's setup on Google Cloud Run, runs on Main queue (Prefect Agent in GCP VM) but it's not scheduled since it's launched from the UI.
   ![Prefect Train/Deploy Flow](images/prefect-train-flow.png)
-* **Streamlit Cloud**: A tool for building web apps with Python easily and sharing them with the world. It gets deployed every time I push to the main branch of the repo. You can access the UI in the URL: [TLDR Email Discriminator](https://tldr-email-discriminator.streamlit.app/)
+* **Streamlit Cloud**: A tool for building web apps with Python easily and sharing them with the world. It gets deployed every time I push to the main branch of the repo
 ![Streamlit Interface](images/streamlit-interface.png).
 
 ## Setup
